@@ -1,0 +1,20 @@
+<table>
+	<tr>
+		#foreach ($header in $headers)
+			<td>$header</td>
+		#end			
+	</tr>
+	#foreach ($prod in $productos)
+	<tr>
+		<td>$prod.darNombre()</td>
+		<td>$prod.darTipo()</td>
+		<td>$prod.darPesoCaja()</td>
+		<td>$prod.darCantidad()</td>
+		<td>$prod.darFechaExpiracion()</td>
+		<td>$prod.darCodigoAlmacen()</td>
+		<td>$prod.darTipoLocal()</td>
+	</tr>
+	#end
+		
+	
+</table>

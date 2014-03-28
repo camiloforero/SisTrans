@@ -1,0 +1,17 @@
+<table border="0" width="100%" id="table5">
+	<tr>
+		<td><a href="videosdefault.htm">Test Videos</a></td>
+	</tr>
+	<tr>
+		<td><a href="busquedaProductos.htm">Ver Productos</a></td>
+	</tr>
+	<tr>
+		<td><a href="busquedaPedidos.htm">Ver Pedidos</a></td>
+	</tr>
+	<tr>
+		<td><a href="registrarPedido.htm">Registrar pedido</a></td>
+	</tr>
+	<tr>
+		<td><a href="seleccionarPedidoOferta.htm">Seleccionar pedido de oferta</a></td>
+	</tr>
+</table>

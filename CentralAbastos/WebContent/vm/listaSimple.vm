@@ -1,0 +1,16 @@
+<form name="seleccion" action="$accion.get(0)" method="POST">'
+	<div>
+		<span>
+			<select name="valor">
+				#foreach ($opcion in $listaOpciones)
+					<option value="$opcion">$opcion</option>
+				#end
+			</select>
+        </span>
+	</div>
+	<div>
+		<span>
+			<input type="submit" value="Submit">
+		</span>
+	</div>
+</form>

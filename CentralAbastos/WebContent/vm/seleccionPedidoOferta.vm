@@ -1,0 +1,21 @@
+<form name="pedidoOferta" action="resultadoSeleccionPedidoOferta.htm">
+<table>
+	<tr>
+		<td>Seleccion</td>
+		#foreach ($header in $headers)
+			<td>$header</td>
+		#end	
+	</tr>
+	#foreach ($item in $items)
+	<tr>
+		<td><input type="radio" name="item" value="$item.get(0)"></td>			
+		#foreach($valor in $item)
+			<td>$valor</td>
+		#end
+	</tr>
+	#end
+	<tr>
+		<td><input type="submit"></td>
+	</tr>
+</table>
+</form>

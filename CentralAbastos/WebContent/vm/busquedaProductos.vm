@@ -1,0 +1,77 @@
+<form name="criterios" action="resultadoBusquedaProductos.htm" method="POST">'
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="todos">Todos
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="producto">Producto
+		</span>
+		<span>
+			<select name="producto">
+				#foreach ($producto in $listaProductos)
+					<option value="$producto">$producto</option>
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="tipoProducto">Tipo Producto
+		</span>
+		<span>
+			<select name="tipoProducto">
+				#foreach ($tipo in $listaTipos)
+					<option value="$tipo">$tipo</option>
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="presentacion">Presentación
+		</span>
+		<span>
+			<select name="presentacion">
+				#foreach ($presentacion in $listaPresentaciones)
+					<option value="$presentacion">$presentacion</option>kg
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="fechaExpiracion">Ordenar por fecha de expiración
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="bodega">Bodega
+		</span>
+		<span>
+			<select name="bodega">
+				#foreach ($bodega in $listaBodegas)
+					<option value="$bodega">$bodega</option>
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="radio" name="criterio" value="local">Local
+		</span>
+		<span>
+			<select name="local">
+				#foreach ($local in $listaLocales)
+					<option value="$local">$local</option>
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="submit" value="Submit">
+		</span>
+	</div>
+</form>

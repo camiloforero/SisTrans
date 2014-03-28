@@ -1,0 +1,73 @@
+<form name="criterios" action="resultadoBusquedaPedidos.htm" method="POST">
+	<div>
+		<span>
+			<input type="radio" name="tipoUsuario" value="comprador" checked>Compradores
+		</span>
+		<span>
+			<select name="comprador">
+				#foreach ($comprador in $listaCompradores)
+					<option value="$comprador">$comprador</option>
+				#end
+			</select>
+		</span>
+		<span>
+			<input type="radio" name="tipoUsuario" value="administrador" checked>Administradores
+		</span>
+		<span>
+			<select name="administrador">
+				#foreach ($administrador in $listaAdministradores)
+					<option value="$administrador">$administrador</option>
+				#end
+			</select>
+		</span>
+		<span>
+			<input type="radio" name="tipoUsuario" value="adminLocal" checked>Administradores de local: 
+			<select name="adminLocal">
+				#foreach ($adminLocal in $listaAdminslocal)
+					<option value="$adminLocal">$adminLocal</option>
+				#end
+			</select>
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="checkbox" name="criterio" value="estaSatisfecho">Está satisfecho?
+		</span>
+		<span>
+			<input type="radio" name="estaSatisfecho" value="si" checked>Satisfecho
+		</span>
+		<span>
+			<input type="radio" name="estaSatisfecho" value="no">Pendiente
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="checkbox" name="criterio" value="rangoFechas">Rango de fechas
+		</span>
+		<span>
+			Desde: <input type="date" name="fechaInicio">
+		</span>
+		<span>
+			Hasta: <input type="date" name="fechaFin">
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="checkbox" name="criterio" value="costo">Costo menor a: 
+		</span>
+		<span>
+			<input type="text" name="valorCosto" value="0">
+		</span>
+		<span>
+			<input type="radio" name="radioCosto" value="unitario" checked>Por unidad
+		</span>
+		<span>
+			<input type="radio" name="radioCosto" value="total">Total
+		</span>
+	</div>
+	<div>
+		<span>
+			<input type="submit" value="Submit">
+		</span>
+	</div>
+</form>

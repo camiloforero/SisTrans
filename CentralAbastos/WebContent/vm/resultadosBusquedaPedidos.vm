@@ -1,0 +1,16 @@
+<table>
+	<tr>
+		#foreach ($header in $headers)
+			<td>$header</td>
+		#end			
+	</tr>
+	#foreach ($item in $items)
+	<tr>
+		#foreach($valor in $item)
+			<td>$valor</td>
+		#end
+	</tr>
+	#end
+		
+	
+</table>
