@@ -155,5 +155,9 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 		System.out.println("pri");
 	}
 
+	public void otro()
+	{
+		
+	}
 
 }
