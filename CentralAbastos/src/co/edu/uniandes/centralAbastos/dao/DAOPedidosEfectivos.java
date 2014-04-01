@@ -144,16 +144,8 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1", prepStmt);
 	}
 	
-	public void metodoPrueba1()
-	{
-		System.out.println("prueba1");
-	}
-
-
-	public void tttttttttttttt()
-	{
-		System.out.println("pri");
-	}
+	
+	
 
 
 }
