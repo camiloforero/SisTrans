@@ -143,6 +143,11 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1", prepStmt);
 	}
+	
+	public void metodoPrueba1()
+	{
+		System.out.println("prueba1");
+	}
 
 
 
