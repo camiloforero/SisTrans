@@ -38,7 +38,7 @@ public class ServletBusquedaProductos extends ServletTemplate {
 		
 		try
 		{
-			vista.put("listaProductos", instancia.darProductos());
+			vista.put("listaProductos", instancia.darNombresProductos());
 			vista.put("listaTipos", instancia.darTipos());
 			vista.put("listaPresentaciones", instancia.darPresentaciones());
 			vista.put("listaLocales", instancia.darLocales());

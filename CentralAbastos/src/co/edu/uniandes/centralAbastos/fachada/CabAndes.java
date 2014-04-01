@@ -20,7 +20,7 @@ import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos.proveedorDetallesValue;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosOferta;
 import co.edu.uniandes.centralAbastos.dao.DAOProducto;
-import co.edu.uniandes.centralAbastos.vos.AlmacenValues;
+import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
@@ -42,7 +42,9 @@ public class CabAndes
 	/**
 	 * Referencia al modulo de pedidoDeOferta 
 	 */
-	private PedidoDeOferta modPedidoDeOferta;
+	private ModPedidoDeOferta modPedidoDeOferta;
+	
+	private ModAlmacen modAlmacen;
 
     
     // -----------------------------------------------------------------
@@ -84,7 +86,8 @@ public class CabAndes
 	public void inicializarRuta(String ruta)
 	{
 		this.ruta = ruta;
-		modPedidoDeOferta = new PedidoDeOferta(new DAOPedidosOferta(ruta));
+		modPedidoDeOferta = new ModPedidoDeOferta(new DAOPedidosOferta(ruta));
+		modAlmacen = new ModAlmacen(new DAOAlmacen(ruta));
 	}
 	
     // ---------------------------------------------------
@@ -109,7 +112,7 @@ public class CabAndes
 		return dao.darListaSimple("tipos");
 	}
 	
-	public ArrayList<String> darProductos() throws Exception
+	public ArrayList<String> darNombresProductos() throws Exception
 	{
 		ConsultaDAO dao = new ConsultaDAO(ruta);
 		return dao.darListaSimple("productos");
@@ -158,12 +161,11 @@ public class CabAndes
 		return respuesta;
 	}
 
-	public Collection darProductosTest() 
+	
+	
+	public boolean agregarBodega(String codigo, double capacidad, double cantidadKg, String tipoProducto) throws Exception
 	{
-		ArrayList<String> respuesta = new ArrayList<String>();
-		respuesta.add("leche");
-		respuesta.add("hummus");
-		return respuesta;
+		return modAlmacen.agregarBodega(new AlmacenValue(codigo, capacidad, cantidadKg, tipoProducto));
 	}
 	
 	//------------------- metodos pedro --------------------------------
@@ -200,7 +202,7 @@ public class CabAndes
 	 }
 	 
 	 	 /**
-		  * Registra la enterga de un proveedor. 
+		  * Registra la entrega de un proveedor. 
 		  * @param idPedidoEfectivo
 		  * @throws Exception
 		  */
@@ -227,58 +229,7 @@ public class CabAndes
 		  */
 		 private void asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
 		 {
-			 DAOAlmacen daoAlm = new DAOAlmacen(this.ruta);
-			 double porc_min_almacenaje = 0.1; // es el porcentaje minimo en el cual se puede dividir el pedido para almacenar en distintas bodegas.
-			 
-			//meter lo que mas se pueda en bodegas llenas
-			int num_cajas = pedidoEntrante.getCantidad();
-			double Wcajas = pedidoEntrante.getPresentacion();
-			ArrayList<AlmacenValues> bodegasDisponibles = daoAlm.darBodegasXTipo(pedidoEntrante.getTipoProducto());
-			ArrayList<AlmacenValues> bodegas_vacias = new ArrayList<AlmacenValues>();
-			for (AlmacenValues bod : bodegasDisponibles) {
-				
-				double cap_disponible = bod.getCapacidad()-bod.getCantidad_kg();
-				int num_cajas_disponible = (int) (cap_disponible/Wcajas);
-				if(cap_disponible > 0 && num_cajas_disponible >= (int)(porc_min_almacenaje*num_cajas) && bod.getCantidad_kg()>0 ) // bodega sin llenar por completo y con espacio para guardar un porcentaje minimo del pedido
-				{
-					int diff = num_cajas-num_cajas_disponible;
-					double x = diff*Wcajas;
-					if(diff > 0) // mete solo diff.
-					{
-						daoAlm.updateAlmacen(x);
-						daoAlm.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas , (num_cajas- diff) , pedidoEntrante.getFechaExpiracion() );
-						num_cajas=diff;
-					}
-					else // metelas todas
-					{
-						daoAlm.updateAlmacen( num_cajas*Wcajas );
-						daoAlm.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas, (num_cajas), pedidoEntrante.getFechaExpiracion() );
-						break;
-					}
-				}
-				else if(cap_disponible == bod.getCapacidad())
-					bodegas_vacias.add(bod);
-			}
-			
-			//meter lo que me queda en bodegas vacias.
-			for (AlmacenValues bod : bodegas_vacias) {
-				double cap_disponible = bod.getCapacidad()-bod.getCantidad_kg();
-				int num_cajas_disponible = (int) (cap_disponible/Wcajas);
-				int diff = num_cajas-num_cajas_disponible;
-				double x = diff*Wcajas;
-				if(diff > 0) // mete solo diff.
-				{
-					daoAlm.updateAlmacen(x);
-					daoAlm.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas , (num_cajas- diff) , pedidoEntrante.getFechaExpiracion() );
-					num_cajas=diff;
-				}
-				else // metelas todas
-				{
-					daoAlm.updateAlmacen( num_cajas*Wcajas );
-					daoAlm.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas, (num_cajas), pedidoEntrante.getFechaExpiracion() );
-					break;
-				}
-			}
+			 modAlmacen.asignarEnBodegas(pedidoEntrante);
 			
 		 }
 		 

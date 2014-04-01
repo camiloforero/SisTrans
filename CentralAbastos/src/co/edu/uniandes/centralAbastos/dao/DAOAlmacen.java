@@ -5,12 +5,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import co.edu.uniandes.centralAbastos.vos.AlmacenValues;
+import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 
 public class DAOAlmacen extends ConsultaDAO 
 {
 
 	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN ";  
+	
+	private final static String AGREGAR_BODEGA = "INSERT INTO BODEGAS VALUES (";
+	private final static String AGREGAR_ALMACEN = "INSERT INTO ALMACEN VALUES (";
 	
 	public DAOAlmacen(String ruta) {
 		super(ruta);
@@ -18,10 +21,10 @@ public class DAOAlmacen extends ConsultaDAO
 	}
 	
 	
-	public ArrayList<AlmacenValues>darBodegasXTipo(String tipoProd) throws Exception
+	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd) throws Exception
 	{
 		PreparedStatement prepStmt = null;
-		ArrayList<AlmacenValues> a = new ArrayList<AlmacenValues>();
+		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
 		
 		try {
 		
@@ -29,7 +32,7 @@ public class DAOAlmacen extends ConsultaDAO
 			
 			while(rs.next()){
 				
-				a.add(new AlmacenValues(rs.getString(1), rs.getDouble(2), rs.getDouble(3) , null));
+				a.add(new AlmacenValue(rs.getString(1), rs.getDouble(2), rs.getDouble(3) , null));
 			}
 	
 		} catch (SQLException e) {
@@ -69,6 +72,38 @@ public class DAOAlmacen extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	
+	/**
+	 * Agrega una nueva bodega a CabAndes</br>
+	 * <b>post: La bodega es agregada, o si ya existe un almacén con el mismo código no se hace nada<b>
+	 * @param value: BodegaValue con el id de la bodega que tiene que ser agregada.
+	 * @return true si la bodega fue agregada exitosamente, false de lo contrario
+	 */
+	public boolean agregarBodega(AlmacenValue value) throws Exception
+	{
+		PreparedStatement prepStmt = null;
+		String query1 = value.getCodigo() + "," + value.getCapacidad() + ",0," + value.getTipo_producto() + ")";
+		String query2 = value.getCodigo() + ",ABIERTA)";
+		try {
+			
+			super.ejecutarTask(AGREGAR_ALMACEN + query1, prepStmt);
+			super.ejecutarTask(AGREGAR_BODEGA + query2, prepStmt);
+			
+			
+		} 
+		catch (SQLException e) 
+		{
+			
+			e.printStackTrace();
+		}finally
+		{
+			super.cerrarConexion(prepStmt);
+		}
+		return true;
+		//TODO: Este método no está revisando si la bodega en cuestión ya existe o no, ni está rebalanceando
+		//los productos para que entren acá.
 		
 	}
 }

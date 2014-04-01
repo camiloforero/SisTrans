@@ -15,7 +15,9 @@ import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 public class DAOPedidosEfectivos extends ConsultaDAO
 {
 	
-	private static final String q1 = "SELECT PO.NOMBRE_PRODUCTO , PROD.TIPO , PO.CANTIDAD , PO.PESO_CAJA , O.FECHA_VENCIMIENTO , O.PRECIO_X_KG FROM PEDIDO_EFECTIVO PE JOIN OFERTA O ON(PE.ID_PEDIDO=O.ID_PEDIDO AND PE.CORREO_PROVEEDOR=O.CORREO_PROVEEDOR) JOIN (PEDIDO_OFERTA PO JOIN PRODUCTOS PROD ON PO.NOMBRE_PRODUCTO = PROD.NOMBRE) ON PE.ID_PEDIDO=PO.ID ";
+	private static final String q1 = 
+			"SELECT PO.NOMBRE_PRODUCTO , PROD.TIPO , PO.CANTIDAD , PO.PESO_CAJA , O.FECHA_VENCIMIENTO , O.PRECIO_X_KG "
+			+ "FROM PEDIDO_EFECTIVO PE JOIN OFERTA O ON(PE.ID_PEDIDO=O.ID_PEDIDO AND PE.CORREO_PROVEEDOR=O.CORREO_PROVEEDOR) JOIN (PEDIDO_OFERTA PO JOIN PRODUCTOS PROD ON PO.NOMBRE_PRODUCTO = PROD.NOMBRE) ON PE.ID_PEDIDO=PO.ID ";			
 	private static final String q2 = 
 			"SELECT PE.CORREO_PROVEEDOR , P.CALIFICACION , P.NUM_ENTREGAS , (PE.FECHA_LLEGADA-PO.FECHA_ENTREGA)AS DIAS_TARDANZA FROM PEDIDO_EFECTIVO PE , PEDIDO_OFERTA PO , PROVEEDORES P WHERE P.CORREO_USUARIO=PE.CORREO_PROVEEDOR";
 	
@@ -34,8 +36,9 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	{
 		PreparedStatement prepStmt = null;
 		try {
+			System.out.println(idPedido + " " + correo + " " + FechaLlegada);
 			
-			super.ejecutarTask( "INSERT INTO PEDIDO_EFECTIVO VALUES ( '"+idPedido+"' , '"+correo+"' , '"+FechaLlegada+"'  );" 
+			super.ejecutarTask( "INSERT INTO PEDIDO_EFECTIVO VALUES ( '"+idPedido+"' , '"+correo+"' , "+FechaLlegada+"  )" 
 					, prepStmt);
 			
 		} catch (SQLException e) {
@@ -82,7 +85,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 		PedidoEfectivoValue resp = null;
 		ResultSet rs;
 		try {
-			rs = hacerQuery(q1 + "WHERE PE.ID_PEDIDO = '"+idPedido+"' " , prepStmt);
+			rs = hacerQuery(q1 + "WHERE O.ID_PEDIDO = '"+idPedido+"' " , prepStmt);
 			
 			while(rs.next())
 			{

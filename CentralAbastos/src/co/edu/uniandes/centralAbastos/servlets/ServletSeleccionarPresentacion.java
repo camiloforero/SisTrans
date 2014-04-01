@@ -41,7 +41,12 @@ public class ServletSeleccionarPresentacion extends ServletTemplate
 		ArrayList<String> accion = new ArrayList<String>();
 		accion.add("listaPresentaciones.htm");
 		vista.put("accion", accion);
-		vista.put("listaOpciones", instancia.darProductosTest());
+		try {
+			vista.put("listaOpciones", instancia.darNombresProductos());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		vista.imprimirVista(respuesta);
 		// TODO Auto-generated method stub
 		

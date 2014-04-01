@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
+
 import co.edu.uniandes.centralAbastos.fachada.CabAndes;
 import co.edu.uniandes.centralAbastos.vistas.Vista;
 import co.edu.uniandes.centralAbastos.vistas.VistaListaSimple;
@@ -41,7 +42,12 @@ public class ServletRegistrarPedido extends ServletTemplate {
 		ArrayList<String> accion = new ArrayList<String>();
 		accion.add("listaPresentaciones.htm");
 		vista.put("accion", accion);
-		vista.put("listaOpciones", instancia.darProductosTest());
+		try {
+			vista.put("listaOpciones", instancia.darNombresProductos());
+		} catch (Exception e) {
+			// TODO Cuadrar bien esta excepción
+			e.printStackTrace();
+		}
 		vista.imprimirVista(respuesta);
 
 	}

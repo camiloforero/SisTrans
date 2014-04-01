@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import co.edu.uniandes.centralAbastos.dao.*;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 
-public class PedidoDeOferta 
+public class ModPedidoDeOferta 
 {
 	/*
 	 * Conexion con la BD
@@ -14,7 +14,7 @@ public class PedidoDeOferta
 	//-------------------------------
 	// Constructor
 	//-------------------------------
-	public PedidoDeOferta(DAOPedidosOferta dao) {
+	public ModPedidoDeOferta(DAOPedidosOferta dao) {
 		super();
 		this.dao = dao;
 	}
@@ -29,7 +29,7 @@ public class PedidoDeOferta
 	 * @return La oferta ganadora. (!) Esta nunca deberia ser null.
 	 * @throws Exception
 	 */
-	public PedidoEfectivoValue darOfertaGanadora(String idPedidoOferta) throws Exception
+	PedidoEfectivoValue darOfertaGanadora(String idPedidoOferta) throws Exception
 	{
 		// Pesos ponderacion
 			double Wprice = 0.7;
