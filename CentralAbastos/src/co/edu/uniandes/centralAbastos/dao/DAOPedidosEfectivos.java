@@ -23,6 +23,8 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	
 	private static final String ID= "ID_PEDIDO";
 	
+	private static final String test = "test";
+	
 	private static final String CORREO = "CORREO_PROVEEDOR"; 
 	
 	private static final String FECHA = "FECHA_LLEGADA"; 
