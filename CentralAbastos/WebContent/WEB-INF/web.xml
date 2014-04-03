@@ -39,16 +39,55 @@
   <servlet-name>ServletRegistrarPedido</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletRegistrarPedido</servlet-class>
  </servlet>
+ 
  <servlet>
   <display-name>ServletSeleccionarPedidoOferta</display-name>
   <servlet-name>ServletSeleccionarPedidoOferta</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletSeleccionarPedidoOferta</servlet-class>
  </servlet>
+ 
  <servlet>
   <display-name>ServletResultadoSeleccionPedidoOferta</display-name>
   <servlet-name>ServletResultadoSeleccionPedidoOferta</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoSeleccionPedidoOferta</servlet-class>
  </servlet>
+ 
+ <servlet>
+  <display-name>ServletCrearBodega</display-name>
+  <servlet-name>ServletCrearBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletCrearBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletEliminarBodega</display-name>
+  <servlet-name>ServletEliminarBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletEliminarBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletAbrirBodega</display-name>
+  <servlet-name>ServletAbrirBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletAbrirBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletCerrarBodega</display-name>
+  <servlet-name>ServletCerrarBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletCerrarBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletVerBodegas</display-name>
+  <servlet-name>ServletVerBodegas</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletVerBodegas</servlet-class>
+ </servlet>
+ 
+  <servlet>
+  <display-name>ServletVerProveedores</display-name>
+  <servlet-name>ServletVerProveedores</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletVerProveedores</servlet-class>
+ </servlet>
+ 
  <!--===XxX===xXx===XxX===xXx===== Servlet Mappings =====xXx===XxX===xXx===XxX===-->
  <servlet-mapping>
   <servlet-name>ServletPlantilla</servlet-name>
@@ -82,16 +121,40 @@
   <servlet-name>ServletSeleccionarPedidoOferta</servlet-name>
   <url-pattern>/seleccionarPedidoOferta.htm</url-pattern>
  </servlet-mapping>
+ 
  <servlet-mapping>
   <servlet-name>ServletResultadoSeleccionPedidoOferta</servlet-name>
   <url-pattern>/resultadoSeleccionPedidoOferta.htm</url-pattern>
  </servlet-mapping>
- <welcome-file-list>
-  <welcome-file>index.html</welcome-file>
-  <welcome-file>index.htm</welcome-file>
-  <welcome-file>index.jsp</welcome-file>
-  <welcome-file>default.html</welcome-file>
-  <welcome-file>default.htm</welcome-file>
-  <welcome-file>default.jsp</welcome-file>
- </welcome-file-list>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletVerBodegas</servlet-name>
+  <url-pattern>/verBodegas.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletCrearBodega</servlet-name>
+  <url-pattern>/crearBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletEliminarBodega</servlet-name>
+  <url-pattern>/eliminarBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletAbrirBodega</servlet-name>
+  <url-pattern>/abrirBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletCerrarBodega</servlet-name>
+  <url-pattern>/cerrarBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+  <servlet-mapping>
+  <servlet-name>ServletVerProveedores</servlet-name>
+  <url-pattern>/verProveedores.htm</url-pattern>
+ </servlet-mapping>
+ 
 </web-app>

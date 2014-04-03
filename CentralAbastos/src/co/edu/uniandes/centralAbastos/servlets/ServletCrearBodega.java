@@ -5,18 +5,18 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ServletVerBodega extends ServletTemplate
+public class ServletCrearBodega extends ServletTemplate 
 {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5346131412288826232L;
+	private static final long serialVersionUID = -5907222173841150583L;
 
 	@Override
 	public String darTituloPagina(HttpServletRequest request) {
 		// TODO Auto-generated method stub
-		return "Cerrar bodega";
+		return "Registrar bodega";
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class ServletVerBodega extends ServletTemplate
 	public void escribirContenido(HttpServletRequest request, HttpServletResponse response) throws IOException 
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

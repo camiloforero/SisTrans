@@ -12,14 +12,8 @@
 		<td><a href="seleccionarPedidoOferta.htm">Seleccionar pedido de oferta</a></td>
 	</tr>
 	<tr>
-		<td><a href="registrarBodega.htm">Registrar bodega</a></td>
-	</tr>
-	<tr>
-		<td><a href="cerrarBodega.htm">Cerrar bodega</a></td>
-	</tr>
-	<tr>
-		<td><a href="verBodegas.htm">Ver bodegas</a></td>
-	</tr>
+		<td><a href="administradorBodegas.htm">Administrador de bodegas</a></td>
+	</tr>	
 	<tr>
 		<td><a href="verProveedores.htm">Ver proveedores</a></td>
 	</tr>
