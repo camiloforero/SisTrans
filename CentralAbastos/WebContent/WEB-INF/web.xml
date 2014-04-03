@@ -4,11 +4,7 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
  <display-name>CentralAbastos</display-name>
  <!-- =======-=======-=======-=======-=======- Servlets -=======-=======-=======-=======-======= -->
- <servlet>
-  <display-name>ServletPlantilla</display-name>
-  <servlet-name>ServletPlantilla</servlet-name>
-  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletPlantilla</servlet-class>
- </servlet>
+ 
  <servlet>
   <display-name>ServletResultadoBusquedaProductos</display-name>
   <servlet-name>ServletResultadoBusquedaProductos</servlet-name>
@@ -59,6 +55,12 @@
  </servlet>
  
  <servlet>
+  <display-name>ServletResultadoCrearBodega</display-name>
+  <servlet-name>ServletResultadoCrearBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoCrearBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
   <display-name>ServletEliminarBodega</display-name>
   <servlet-name>ServletEliminarBodega</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletEliminarBodega</servlet-class>
@@ -89,14 +91,12 @@
  </servlet>
  
  <!--===XxX===xXx===XxX===xXx===== Servlet Mappings =====xXx===XxX===xXx===XxX===-->
- <servlet-mapping>
-  <servlet-name>ServletPlantilla</servlet-name>
-  <url-pattern>/videosdefault.htm</url-pattern>
- </servlet-mapping>
+  
  <servlet-mapping>
   <servlet-name>ServletResultadoBusquedaProductos</servlet-name>
   <url-pattern>/resultadoBusquedaProductos.htm</url-pattern>
  </servlet-mapping>
+ 
  <servlet-mapping>
   <servlet-name>ServletBusquedaProductos</servlet-name>
   <url-pattern>/busquedaProductos.htm</url-pattern>
@@ -135,6 +135,11 @@
  <servlet-mapping>
   <servlet-name>ServletCrearBodega</servlet-name>
   <url-pattern>/crearBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletResultadoCrearBodega</servlet-name>
+  <url-pattern>/resultadoCrearBodega.htm</url-pattern>
  </servlet-mapping>
  
  <servlet-mapping>

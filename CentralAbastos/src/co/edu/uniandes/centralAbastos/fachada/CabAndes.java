@@ -11,7 +11,6 @@
 package co.edu.uniandes.centralAbastos.fachada;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import co.edu.uniandes.centralAbastos.dao.ConsultaDAO;
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
@@ -106,6 +105,11 @@ public class CabAndes
 	    return dao.darVideosDefault();
 	}	
 	
+	/**
+	 * Da los tipos de producto que existen</br>
+	 * @return Un ArrayList con los nombres de todos los productos que existen
+	 * @throws Exception: 
+	 */
 	public ArrayList<String> darTipos() throws Exception
 	{
 		ConsultaDAO dao = new ConsultaDAO(ruta);
@@ -163,9 +167,20 @@ public class CabAndes
 
 	
 	
-	public boolean agregarBodega(String codigo, double capacidad, double cantidadKg, String tipoProducto) throws Exception
+	/**
+	 * </br>
+	 * <b>pre: <b> </br>
+	 * <b>post: <b>
+	 * @param codigo
+	 * @param capacidad
+	 * @param cantidadKg
+	 * @param tipoProducto
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean agregarBodega(String codigo, double capacidad, String tipoProducto) throws Exception
 	{
-		return modAlmacen.agregarBodega(new AlmacenValue(codigo, capacidad, cantidadKg, tipoProducto));
+		return modAlmacen.agregarBodega(new AlmacenValue(codigo, capacidad, 0, tipoProducto));
 	}
 	
 	//------------------- metodos pedro --------------------------------

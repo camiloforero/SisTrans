@@ -12,8 +12,8 @@ public class DAOAlmacen extends ConsultaDAO
 
 	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN ";  
 	
-	private final static String AGREGAR_BODEGA = "INSERT INTO BODEGAS VALUES (";
-	private final static String AGREGAR_ALMACEN = "INSERT INTO ALMACEN VALUES (";
+	private final static String AGREGAR_BODEGA = "INSERT INTO BODEGAS VALUES ('";
+	private final static String AGREGAR_ALMACEN = "INSERT INTO ALMACEN VALUES ('";
 	
 	public DAOAlmacen(String ruta) {
 		super(ruta);
@@ -84,8 +84,8 @@ public class DAOAlmacen extends ConsultaDAO
 	public boolean agregarBodega(AlmacenValue value) throws Exception
 	{
 		PreparedStatement prepStmt = null;
-		String query1 = value.getCodigo() + "," + value.getCapacidad() + ",0," + value.getTipo_producto() + ")";
-		String query2 = value.getCodigo() + ",ABIERTA)";
+		String query1 = value.getCodigo() + "'," + value.getCapacidad() + ",0,'" + value.getTipo_producto() + "')";
+		String query2 = value.getCodigo() + "','ABIERTA')";
 		try {
 			
 			super.ejecutarTask(AGREGAR_ALMACEN + query1, prepStmt);
@@ -95,7 +95,8 @@ public class DAOAlmacen extends ConsultaDAO
 		} 
 		catch (SQLException e) 
 		{
-			
+			System.out.println(AGREGAR_ALMACEN + query1);
+			System.out.println(AGREGAR_BODEGA + query2);
 			e.printStackTrace();
 		}finally
 		{

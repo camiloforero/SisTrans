@@ -2,14 +2,13 @@ package co.edu.uniandes.centralAbastos.vistas;
 
 import java.io.PrintWriter;
 
-public class VistaBusquedaProductos extends Vista {
+public class VistaCrearBodega extends Vista {
 
 	@Override
 	public void imprimirVista(PrintWriter respuesta) 
 	{
-		
-		template = engine.getTemplate("busquedaProductos.vm");        
-        merge(respuesta);	
+		template = engine.getTemplate("crearBodega.vm");        
+        merge(respuesta);
 
 	}
 

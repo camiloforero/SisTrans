@@ -2,19 +2,22 @@ package co.edu.uniandes.centralAbastos.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import co.edu.uniandes.centralAbastos.fachada.CabAndes;
 import co.edu.uniandes.centralAbastos.vistas.Vista;
-import co.edu.uniandes.centralAbastos.vistas.VistaListaSimple;
 import co.edu.uniandes.centralAbastos.vistas.VistaSeleccionTabla;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 
 public class ServletSeleccionarPedidoOferta extends ServletTemplate
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5992372373628866795L;
 
 	@Override
 	public String darTituloPagina(HttpServletRequest request) {

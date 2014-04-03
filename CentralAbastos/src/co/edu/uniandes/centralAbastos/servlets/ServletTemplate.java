@@ -125,7 +125,7 @@ public abstract class ServletTemplate extends HttpServlet {
         respuesta.println( "       <table border=\"1\" width=\"100%\" style=\"border-collapse: collapse\" bordercolor=\"#999999\" id=\"table2\">" );
         respuesta.println( "           <tr>" );
         respuesta.println( "               <td class=\"h2\" height=\"30\">" );
-        respuesta.println( "               <h1 align=\"center\">Sistema Web de administración de abastos</td>" );
+        respuesta.println( "               <h1 align=\"center\">Central de abastos Andes</td>" );
         respuesta.println( "           </tr>" );
         respuesta.println( "           <tr>" );
         respuesta.println( "               <td bgcolor=\"#000000\" height=\"3px\"></td>" );

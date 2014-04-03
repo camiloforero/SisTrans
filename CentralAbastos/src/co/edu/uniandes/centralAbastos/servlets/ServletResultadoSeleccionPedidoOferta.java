@@ -11,6 +11,11 @@ import co.edu.uniandes.centralAbastos.fachada.CabAndes;
 public class ServletResultadoSeleccionPedidoOferta extends ServletTemplate
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6813196340322574667L;
+
 	@Override
 	public String darTituloPagina(HttpServletRequest request) {
 		// TODO Auto-generated method stub

@@ -291,6 +291,13 @@ public class ConsultaDAO {
     
     
     
+    /**
+     * Da una lista de Strings con cierta información dependiendo del parámetro de entrada</br>
+     * <b>pre: <b>El parámetro de entrada está suportado</br>
+     * @param listaPedida: La lista que se desea obtener.
+     * @return Una lista de tipos, productos, bodegas, etc
+     * @throws Exception: Si algo sucede dentro de la base de datos
+     */
     public ArrayList<String> darListaSimple(String listaPedida) throws Exception
     {
     	PreparedStatement prepStmt = null;	

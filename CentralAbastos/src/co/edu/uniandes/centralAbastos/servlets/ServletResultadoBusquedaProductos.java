@@ -2,7 +2,6 @@ package co.edu.uniandes.centralAbastos.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +12,11 @@ import co.edu.uniandes.centralAbastos.vistas.VistaResultadosBusquedaProductos;
 import co.edu.uniandes.centralAbastos.vos.ProductosValue;
 
 public class ServletResultadoBusquedaProductos extends ServletTemplate {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1051818783289857124L;
 
 	@Override
 	public String darTituloPagina(HttpServletRequest request) {
@@ -35,8 +39,7 @@ public class ServletResultadoBusquedaProductos extends ServletTemplate {
 		String criterio = request.getParameter("criterio");
 		try
 		{
-			ArrayList resultados = instancia.darResultadoBusquedaProductos(criterio + ", " + request.getParameter(criterio));
-			vista.put("productos", resultados);
+			vista.put("productos", instancia.darResultadoBusquedaProductos(criterio + ", " + request.getParameter(criterio)));
 			vista.put("headers", ProductosValue.darHeader());
 			vista.imprimirVista(respuesta);
 		}

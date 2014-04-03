@@ -1,0 +1,29 @@
+<form name="seleccion" action="resultadoCrearBodega.htm" method="POST">
+	<table>
+		<tr>
+			<td>Código</td>
+			<td>Capacidad</td>
+			<td>Tipo de producto</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="text" name="codigo">
+			</td>
+			<td>
+				<input type="text" name="capacidad">
+			</td>
+			<td>
+				<select name="tipo">
+					#foreach ($tipo in $listaTipos)
+						<option value="$tipo">$tipo</option>
+					#end
+                </select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="submit">
+			</td>
+		</tr>'
+	</table>
+</form>
