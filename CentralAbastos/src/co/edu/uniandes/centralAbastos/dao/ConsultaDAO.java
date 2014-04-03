@@ -87,9 +87,9 @@ public class ConsultaDAO {
 	
 	private static final String listaPresentaciones = "SELECT * FROM CAJAS";
 	
-	private static final String listaLocales = "SELECT * FROM LOCALES";
+	private static final String listaLocales = "SELECT * FROM LOCALES ";
 	
-	private static final String listaBodegas = "SELECT * FROM BODEGAS";
+	private static final String listaBodegas = "SELECT * FROM BODEGAS ";
 
 	private static final String listaUsuarios = "SELECT CORREO, (CASE WHEN c.CORREO_USUARIO IS NOT NULL THEN 'Comprador' WHEN u.ES_ADMINISTRADOR = 'Si' THEN 'Administrador' WHEN a.CORREO_USUARIO IS NOT NULL THEN 'Administrador local' WHEN p.CORREO_USUARIO IS NOT NULL THEN 'Proveedor' ELSE 'Otro' END) AS TIPO "
 													+ "FROM USUARIOS u LEFT JOIN COMPRADORES c ON u.CORREO = c.CORREO_USUARIO LEFT JOIN ADMIN_LOCAL a ON u.CORREO = a.CORREO_USUARIO LEFT JOIN PROVEEDORES p ON u.CORREO = p.CORREO_USUARIO";
@@ -193,13 +193,18 @@ public class ConsultaDAO {
      * @param con objeto de conexi�n a la base de datos
      * @throws SistemaCinesException Si se presentan errores de conexi�n
      */
-    public void closeConnection(Connection connection) throws Exception {        
-		try {
+    public void closeConnection(Connection connection) throws Exception 
+    {        
+    	
+		try 
+		{
 			connection.close();
 			connection = null;
+			
 		} catch (SQLException exception) {
-			throw new Exception("ERROR: ConsultaDAO: closeConnection() = cerrando una conexi�n.");
+			throw new Exception("Error a la hora de cerrar una conexión");
 		}
+		//TODO: Crear nuevas excepciones
     } 
     
     // ---------------------------------------------------
@@ -232,12 +237,7 @@ public class ConsultaDAO {
     {
     	if (prepStmt != null) 
 		{
-			try {
-				prepStmt.close();
-			} catch (SQLException exception) {
-				
-				throw new Exception("ERROR: ConsultaDAO: loadRow() =  cerrando una conexión.");
-			}
+			prepStmt.close();
 		}
 		closeConnection(conexion);
     }
@@ -306,6 +306,8 @@ public class ConsultaDAO {
     	
     	String consulta = null;
     	String buscado = null;
+    	System.out.println(listaPedida);
+    	
     	if(listaPedida.equals("tipos"))
     	{
     		consulta = consultaTipos;
@@ -325,16 +327,25 @@ public class ConsultaDAO {
     	{
     		consulta = listaLocales;
     		buscado = local;    				
-    	}
-    	else if(listaPedida.equals("bodegas"))
-    	{
-    		consulta = listaBodegas;
-    		buscado = bodega;    				
-    	}
+    	}    	
     	else if(listaPedida.equals("usuarios"))
     	{
     		consulta = listaUsuarios;
     		buscado = correo;    				
+    	}
+    	else if(listaPedida.startsWith("bodegas"))
+    	{
+    		System.out.println("entra");
+    		consulta = listaBodegas;
+    		buscado = bodega;
+    		if(listaPedida.equals("bodegasAbiertas"))
+    		{
+    			consulta += "WHERE ESTADO = 'ABIERTA'";
+    		}
+    		else if(listaPedida.equals("bodegasCerradas"))
+    		{
+    			consulta += "WHERE ESTADO = 'CERRADA'";
+    		}
     	}
     			
     	

@@ -67,15 +67,33 @@
  </servlet>
  
  <servlet>
+  <display-name>ServletResultadoEliminarBodega</display-name>
+  <servlet-name>ServletResultadoEliminarBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoEliminarBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
   <display-name>ServletAbrirBodega</display-name>
   <servlet-name>ServletAbrirBodega</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletAbrirBodega</servlet-class>
  </servlet>
  
  <servlet>
+  <display-name>ServletResultadoAbrirBodega</display-name>
+  <servlet-name>ServletResultadoAbrirBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoAbrirBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
   <display-name>ServletCerrarBodega</display-name>
   <servlet-name>ServletCerrarBodega</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletCerrarBodega</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletResultadoCerrarBodega</display-name>
+  <servlet-name>ServletResultadoCerrarBodega</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoCerrarBodega</servlet-class>
  </servlet>
  
  <servlet>
@@ -148,13 +166,28 @@
  </servlet-mapping>
  
  <servlet-mapping>
+  <servlet-name>ServletResultadoEliminarBodega</servlet-name>
+  <url-pattern>/resultadoEliminarBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
   <servlet-name>ServletAbrirBodega</servlet-name>
   <url-pattern>/abrirBodega.htm</url-pattern>
  </servlet-mapping>
  
  <servlet-mapping>
+  <servlet-name>ServletResultadoAbrirBodega</servlet-name>
+  <url-pattern>/resultadoAbrirBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
   <servlet-name>ServletCerrarBodega</servlet-name>
   <url-pattern>/cerrarBodega.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletResultadoCerrarBodega</servlet-name>
+  <url-pattern>/resultadoCerrarBodega.htm</url-pattern>
  </servlet-mapping>
  
   <servlet-mapping>

@@ -77,4 +77,21 @@ public class ModAlmacen
 		
 	 }
 
+	public boolean eliminarBodega(String codigo) throws Exception
+	{
+		return dao.eliminarBodega(codigo);
+	}
+
+	public void cerrarBodega(String codigo) throws Exception 
+	{
+		dao.cerrarBodega(codigo);
+		
+	}
+
+	public void abrirBodega(String codigo) throws Exception
+	{
+		dao.abrirBodega(codigo);
+		
+	}
+
 }

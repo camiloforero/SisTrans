@@ -2,6 +2,7 @@ package co.edu.uniandes.centralAbastos.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,9 @@ public class ServletSeleccionarPedidoOferta extends ServletTemplate
 		Vista vista = new VistaSeleccionTabla();
 		CabAndes instancia = CabAndes.darInstancia();
 		vista.put("headers", PedidoOfertaValue.darHeaders());
+		ArrayList<String> accion = new ArrayList<String>();
+		accion.add("resultadoSeleccionPedidoOferta.htm");
+		vista.put("accion", accion);
 		try {
 			vista.put("items", instancia.darPedidosDeOfertaCerrados());
 		} catch (Exception e) {

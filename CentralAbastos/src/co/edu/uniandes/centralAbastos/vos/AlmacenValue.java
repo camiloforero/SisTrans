@@ -1,5 +1,8 @@
 package co.edu.uniandes.centralAbastos.vos;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class AlmacenValue 
 {
  
@@ -44,6 +47,12 @@ public class AlmacenValue
 		
 		public String getEstado() {
 			return estado;
+		}
+
+		public static ArrayList<String> darHeaders() 
+		{
+			ArrayList<String> respuesta = new ArrayList();
+			return respuesta;
 		}
 		
 		

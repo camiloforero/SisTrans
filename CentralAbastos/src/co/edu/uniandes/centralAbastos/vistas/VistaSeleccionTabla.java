@@ -8,7 +8,7 @@ public class VistaSeleccionTabla extends Vista
 	@Override
 	public void imprimirVista(PrintWriter respuesta) 
 	{
-		template = engine.getTemplate("seleccionPedidoOferta.vm");
+		template = engine.getTemplate("seleccionTabla.vm");
 		merge(respuesta);
 	}
 

@@ -126,12 +126,33 @@ public class CabAndes
 		ConsultaDAO dao = new ConsultaDAO(ruta);
 		return dao.darListaSimple("presentaciones");
 	}
+	
+	
+	
+	public ArrayList<String> darCodigosBodegasAbiertas() throws Exception
+	{
+		ConsultaDAO dao = new ConsultaDAO(ruta);
+		return dao.darListaSimple("bodegasAbiertas");
+	}
+	
+	public ArrayList<String> darCodigosBodegasCerradas() throws Exception
+	{
+		ConsultaDAO dao = new ConsultaDAO(ruta);
+		return dao.darListaSimple("bodegasCerradas");
+	}
+	
 	public ArrayList<String> darLocales() throws Exception
 	{
 		ConsultaDAO dao = new ConsultaDAO(ruta);
 		return dao.darListaSimple("locales");
 	}
-	public ArrayList<String> darBodegas() throws Exception
+	
+	/**
+	 * Método que da los códigos de todas las bodegas</br>
+	 * @return ArrayList que contiene Strings con los códigos de todas las bodegas
+	 * @throws Exception
+	 */
+	public ArrayList<String> darCodigosBodegas() throws Exception
 	{
 		ConsultaDAO dao = new ConsultaDAO(ruta);
 		return dao.darListaSimple("bodegas");
@@ -168,9 +189,9 @@ public class CabAndes
 	
 	
 	/**
-	 * </br>
+	 * Agrega una nueva bodega a CabAndes</br>
 	 * <b>pre: <b> </br>
-	 * <b>post: <b>
+	 * <b>post: La bodega con los parámetros dados ha sido agregada satisfactoriamente <b>
 	 * @param codigo
 	 * @param capacidad
 	 * @param cantidadKg
@@ -181,6 +202,11 @@ public class CabAndes
 	public boolean agregarBodega(String codigo, double capacidad, String tipoProducto) throws Exception
 	{
 		return modAlmacen.agregarBodega(new AlmacenValue(codigo, capacidad, 0, tipoProducto));
+	}
+	
+	public boolean eliminarBodega(String codigo) throws Exception
+	{
+		return modAlmacen.eliminarBodega(codigo);
 	}
 	
 	//------------------- metodos pedro --------------------------------
@@ -247,6 +273,30 @@ public class CabAndes
 			 modAlmacen.asignarEnBodegas(pedidoEntrante);
 			
 		 }
+
+		/**
+		 * Cierra la bodega cuyo código entra como parámetro</br>
+		 * <b>pre: <b>La bodega debe existir, y estar abierta </br>
+		 * <b>post: <b>La bodega ahora está cerrado
+		 * @param codigo: ID único de la bodega
+		 */
+		public void cerrarBodega(String codigo) throws Exception
+		{
+			modAlmacen.cerrarBodega(codigo);
+			
+		}
+
+		/**
+		 * Abre la bodega cuyo código entra como parámetro</br>
+		 * <b>pre: <b>La bodega debe existir, y estar cerrada </br>
+		 * <b>post: <b>La bodega ahora está abierta
+		 * @param codigo: ID único de la bodega
+		 */
+		public void abrirBodega(String codigo) throws Exception
+		{
+			modAlmacen.abrirBodega(codigo);
+			
+		}
 		 
 		 
 		 

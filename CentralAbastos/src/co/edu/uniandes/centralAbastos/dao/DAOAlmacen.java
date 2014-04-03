@@ -9,11 +9,22 @@ import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 
 public class DAOAlmacen extends ConsultaDAO 
 {
+	
 
+	
+	/**
+	 * 
+	 */
 	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN ";  
 	
 	private final static String AGREGAR_BODEGA = "INSERT INTO BODEGAS VALUES ('";
 	private final static String AGREGAR_ALMACEN = "INSERT INTO ALMACEN VALUES ('";
+	
+	private final static String ELIMINAR_BODEGA = "DELETE FROM BODEGAS WHERE COD_ALMACEN = '";
+	private final static String ELIMINAR_ALMACEN = "DELETE FROM ALMACEN WHERE CODIGO = '";
+	
+	private static final String CERRAR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'CERRADA' WHERE COD_ALMACEN = '";
+	private static final String ABRIR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'ABIERTA' WHERE COD_ALMACEN = '";
 	
 	public DAOAlmacen(String ruta) {
 		super(ruta);
@@ -104,6 +115,78 @@ public class DAOAlmacen extends ConsultaDAO
 		}
 		return true;
 		//TODO: Este método no está revisando si la bodega en cuestión ya existe o no, ni está rebalanceando
+		//los productos para que entren acá.
+		
+	}
+
+
+	public boolean eliminarBodega(String codigo) throws Exception
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			super.ejecutarTask(ELIMINAR_BODEGA + codigo + "'", prepStmt);
+			super.ejecutarTask(ELIMINAR_ALMACEN + codigo + "'", prepStmt);
+			
+			
+		} 
+		catch (SQLException e) 
+		{
+			System.out.println(AGREGAR_ALMACEN + codigo + "'");
+			System.out.println(AGREGAR_BODEGA + codigo + "'");
+			e.printStackTrace();
+		}finally
+		{
+			super.cerrarConexion(prepStmt);
+		}
+		return true;
+		//TODO: Este método no está rebalanceando
+		//los productos para que entren acá.
+	}
+
+
+	public void cerrarBodega(String codigo) throws Exception
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			super.ejecutarTask(CERRAR_BODEGA + codigo + "'", prepStmt);
+			System.out.println(CERRAR_BODEGA + codigo + "'");
+			
+			
+		} 
+		catch (SQLException e) 
+		{
+			System.out.println(CERRAR_BODEGA + codigo + "'");
+			e.printStackTrace();
+		}finally
+		{
+			super.cerrarConexion(prepStmt);
+		}
+		//TODO: Este método no está rebalanceando
+		//los productos para que entren acá.
+		
+	}
+
+
+	public void abrirBodega(String codigo) throws Exception
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			super.ejecutarTask(ABRIR_BODEGA + codigo + "'", prepStmt);
+			
+			
+		} 
+		catch (SQLException e) 
+		{
+			System.out.println(ABRIR_BODEGA + codigo + "'");
+			e.printStackTrace();
+		}finally
+		{
+			super.cerrarConexion(prepStmt);
+		}
+		//TODO: Este método no está rebalanceando
 		//los productos para que entren acá.
 		
 	}

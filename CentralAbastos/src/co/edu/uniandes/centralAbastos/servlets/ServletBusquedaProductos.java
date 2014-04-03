@@ -42,7 +42,7 @@ public class ServletBusquedaProductos extends ServletTemplate {
 			vista.put("listaTipos", instancia.darTipos());
 			vista.put("listaPresentaciones", instancia.darPresentaciones());
 			vista.put("listaLocales", instancia.darLocales());
-			vista.put("listaBodegas", instancia.darBodegas());
+			vista.put("listaBodegas", instancia.darCodigosBodegas());
 			
 			vista.imprimirVista(respuesta); //Imprime los resultados de acuerdo a la vista elegida
 		}
