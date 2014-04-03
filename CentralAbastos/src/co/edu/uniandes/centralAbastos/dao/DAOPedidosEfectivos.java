@@ -147,5 +147,9 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	
 	
 
+	public void otro()
+	{
+		
+	}
 
 }
