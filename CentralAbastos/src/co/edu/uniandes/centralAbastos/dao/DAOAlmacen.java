@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
+import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 
 public class DAOAlmacen extends ConsultaDAO 
 {
@@ -15,7 +16,9 @@ public class DAOAlmacen extends ConsultaDAO
 	/**
 	 * 
 	 */
-	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN ";  
+	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN "; 
+	
+	public final static String ITEMS_INVENTARIO = "select ii.* from item_inventario ii ";
 	
 	private final static String AGREGAR_BODEGA = "INSERT INTO BODEGAS VALUES ('";
 	private final static String AGREGAR_ALMACEN = "INSERT INTO ALMACEN VALUES ('";
@@ -31,6 +34,29 @@ public class DAOAlmacen extends ConsultaDAO
 		
 	}
 	
+	/**
+	 * Busca una bodega especifica de la base de datos.
+	 * @param codigo del almacen en cuestion
+	 * @return la bodega si lo encuentra o null en caso de que no exista. 
+	 */
+	public AlmacenValue darBodega(String codigo)
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			ResultSet rs = super.hacerQuery(ALL_BODEGAS+" where A.CODIGO=' "+codigo+"' ", prepStmt);
+			if(rs.next()){
+		
+				return new AlmacenValue(rs.getString(1), rs.getDouble(2), rs.getDouble(3), rs.getString(4));
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd) throws Exception
 	{
@@ -55,12 +81,12 @@ public class DAOAlmacen extends ConsultaDAO
 		return a;
 	}
 	
-	public void updateAlmacen(double cantidadProducto) throws Exception
+	public void updateAlmacen(double cantidadProducto, String codAlmacen) throws Exception
 	{
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO="+cantidadProducto, prepStmt);
+			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO="+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
 			
 		} catch (SQLException e) {
 			
@@ -70,21 +96,35 @@ public class DAOAlmacen extends ConsultaDAO
 		}
 	}
 	
-	public void insertarEnInventario(String nomb_producto,String cod_almacen,double peso_caja,int cantidad,String fechaExpiracion)
+	/**
+	 * Intenta insertar un nuevo item en el inventario. Lo inserta sii el tipo de producto que el almacen "almacena" corresponde al tipo de producto que se intenta almacenar.
+	 * @param nomb_producto
+	 * @param cod_almacen
+	 * @param peso_caja
+	 * @param cantidad
+	 * @param fechaExpiracion
+	 * @return true si lo pudo almacenar o false dlc.
+	 */
+	public boolean insertarEnInventario(String nomb_producto, String tipoProd, String cod_almacen,double peso_caja,int cantidad,String fechaExpiracion)
 	{
 		PreparedStatement prepStmt = null;
 		
 		try {
-			
-			super.ejecutarTask( "INSERT INTO ITEM_INVENTARIO VALUES("+nomb_producto+","+cod_almacen+","+peso_caja+","+cantidad+","+fechaExpiracion+")"  
+			ResultSet rs = super.hacerQuery("Select * from almacen a where a.codigo = ' "+cod_almacen+" '  and a.TIPO_PRODUCTO = ' "+tipoProd +" ' ", prepStmt);
+			if( ! rs.next() ) {
+				super.ejecutarTask( "INSERT INTO ITEM_INVENTARIO VALUES("+nomb_producto+","+cod_almacen+","+peso_caja+","+cantidad+","+fechaExpiracion+")"  
 					, prepStmt);
+				return true;
+			}
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		return false;
 	}
+	
 	
 	/**
 	 * Agrega una nueva bodega a CabAndes</br>
@@ -95,7 +135,7 @@ public class DAOAlmacen extends ConsultaDAO
 	public boolean agregarBodega(AlmacenValue value) throws Exception
 	{
 		PreparedStatement prepStmt = null;
-		String query1 = value.getCodigo() + "'," + value.getCapacidad() + ",0,'" + value.getTipo_producto() + "')";
+		String query1 = value.getCodigo() + "'," + value.getCapacidad() + ",0,'" + value.getTipoProducto()+ "')";
 		String query2 = value.getCodigo() + "','ABIERTA')";
 		try {
 			
@@ -141,7 +181,7 @@ public class DAOAlmacen extends ConsultaDAO
 		}
 		return true;
 		//TODO: Este método no está rebalanceando
-		//los productos para que entren acá.
+		//los productos para que salgan de acá.
 	}
 
 
@@ -164,11 +204,11 @@ public class DAOAlmacen extends ConsultaDAO
 			super.cerrarConexion(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
-		//los productos para que entren acá.
+		//los productos para que salgan de acá.
 		
 	}
 
-
+ 
 	public void abrirBodega(String codigo) throws Exception
 	{
 		PreparedStatement prepStmt = null;
@@ -187,7 +227,124 @@ public class DAOAlmacen extends ConsultaDAO
 			super.cerrarConexion(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
-		//los productos para que entren acá.
+		//los productos para que vuelvan a entrar acá.
 		
+	}
+	
+	// Iter 3 
+	
+	/**
+	 * Reporta los item inventario de una bodega especifica. 
+	 * @param codigoBodega es el de la bodega.
+	 * @return La lista si se encontro la bodega, o vacia dlc.
+	 */
+	public ArrayList<ItemInventarioValue> darExistenciasDeUnaBodega(String codigoBodega)
+	{
+		PreparedStatement prepStmt = null;
+		ArrayList<ItemInventarioValue> resp = new ArrayList<ItemInventarioValue>();
+		
+		try {
+			ResultSet rs = super.hacerQuery(ITEMS_INVENTARIO+" where cod_almacen=' "+codigoBodega+" ' ", prepStmt);
+			
+			while(rs.next()){
+				ItemInventarioValue item = new ItemInventarioValue(rs.getString(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),rs.getString(5));
+				resp.add(item);
+			}
+		
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return resp;
+	}
+	
+	/**
+	 * Operacion que cambia un elemento de inventario, de una bodega a otra. Puede cambiar de un local a otro pero aqui solo se utiliza con bodega.
+	 */
+	public void updateDueñoExistencias(ItemInventarioValue item, String codigoNuevaBodega)
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			super.ejecutarTask(" UPDATE item_inventario set cod_almacen = '"+codigoNuevaBodega+"' where nomb_producto = '"+item.getNomb_producto()+"' and peso_caja = '"+item.getPresentacion()+"' "
+					+ " and cantidad = '"+item.getCantidad()+" ' and cod_almacen = '"+item.getCod_almacen()+" '  "
+					, prepStmt);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Operacion que modifica la cantidad de cajas para una presentacion especifica de una bodega dada, en la tabla de item inventario
+	 * @return El numero de columnas que modifico. 
+	 * 
+	 */
+	public int updateCantidadCajas(String nomb_producto, double wcajas, int cantidad_cajas, String codigoNuevaBodega)
+	{
+		PreparedStatement prepStmt = null;
+		
+		try {
+			
+			return super.ejecutarTask(" UPDATE item_inventario set cantidad = "+cantidad_cajas+" where nomb_producto = '"+nomb_producto+"' and peso_caja = '"+wcajas+"' "
+					+ " and cod_almacen = '"+codigoNuevaBodega+" '  " , prepStmt);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * Capacidad total disponible en todas las bodegas diferentes a la que tiene codBodega.	
+	 * @return la capacidad en todas las bodegas distintas a codBodega. 
+	 * 		para retornar la capacidad de todas llamar el metodo con codBodega como cadena vacia.
+	 */
+	public double darCapacidadTotalDisp(String codBodega)
+	{
+		PreparedStatement prepStmt = null;
+		double resp = 0;
+		try {
+			ResultSet rs = super.hacerQuery( "select sum(capacidad-cantidad_producto) from almacen a join bodegas b on a.codigo=b.cod_almacen where b.cod_almacen !='"+codBodega+"'" , prepStmt);
+			if(rs.next())
+				resp = rs.getDouble(1);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return resp;
+	}
+
+	/**
+	 * 
+	 * @param codigo
+	 * @param wcajas
+	 * @return true si la bodega maneja cajas de peso Wcaja o false dlc.
+	 */
+	public boolean bodegaTienePresentaciones(String codigo, double wcajas) {
+		String qq=
+				"Select * from cajas where "+wcajas+" in (Select Distinct ii.peso_caja from (almacen a join bodegas b on a.codigo=b.cod_almacen) join item_inventario ii on a.codigo=ii.COD_ALMACEN where a.CODIGO='"+codigo+"')"; 
+		
+		try {
+			ResultSet rs;
+			PreparedStatement prepStmt = null;
+			rs = super.hacerQuery(qq, prepStmt);
+			if(rs.next()) // si la tabla no viene vacia
+				return true;
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return false;
+	
 	}
 }

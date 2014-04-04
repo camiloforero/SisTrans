@@ -164,7 +164,9 @@ public class DAOTest {
     {
     	establecerConexion(cadenaConexion, usuario, clave);
 		prepStmt = conexion.prepareStatement(statement);
-		prepStmt.executeUpdate();
+		System.out.println(prepStmt.executeUpdate());
+		
+		System.out.println(prepStmt.getUpdateCount());
     }
     
     
@@ -192,7 +194,16 @@ public class DAOTest {
 			
     }
     
-   
+    public void x() throws SQLException
+    {
+    	PreparedStatement prepStmt = null;
+    	
+    	ejecutarTask("update oferta set precio_x_kg = 2000", prepStmt);
+    	ejecutarTask("commit", prepStmt);
+    	System.out.println(prepStmt.getUpdateCount());
+    
+    }
+    
 
     
 }

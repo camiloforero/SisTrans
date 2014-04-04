@@ -108,7 +108,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	/**
 	 * Reporta los valores necesarios de un proveedor que entrego el pedido que entra por parametro.
 	 */
-	//clase interna para guardar los valores
+	// Clase interna para guardar los valores
 	public class proveedorDetallesValue
 	{
 		public String correo;
@@ -124,6 +124,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			this.diasTarde = diasTarde;
 		}
 	}
+	// End clase interna.
 	
 	public proveedorDetallesValue darDetallesProveedorDePedidoEfectivo(String idPedido) throws SQLException
 	{

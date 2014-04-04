@@ -36,7 +36,7 @@ public class AlmacenValue
 			return cantidadKg;
 		}
 
-		public String getTipo_producto() {
+		public String getTipoProducto() {
 			return tipoProducto;
 		}
 		
