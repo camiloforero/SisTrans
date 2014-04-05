@@ -20,6 +20,7 @@ import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos.proveedorDetallesV
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosOferta;
 import co.edu.uniandes.centralAbastos.dao.DAOProducto;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
+import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
@@ -269,13 +270,17 @@ public class CabAndes
 			 
 		 }
 		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
+		 // Req 2.2-2.4 Iter 2
+		 /**
+		  * 
+		  * @param idPedidoLocal
+		  * @param itemsQueSatisfacen - lista de tuplas de la cual se van a extraer los productos para saisfacer el pedido del local.
+ 		  * @return
+		  */
+		 public boolean enviarPedidosFromBodegasToLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
+		 {
+			 
+		 }
 		 
 		 // Iteracion # 3
 		 /**
@@ -284,7 +289,6 @@ public class CabAndes
 		 private void asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
 		 {
 			 modAlmacen.asignarEnBodegas(pedidoEntrante);
-			
 		 }
 
 		/**
@@ -296,7 +300,6 @@ public class CabAndes
 		public void cerrarBodega(String codigo) throws Exception
 		{
 			modAlmacen.cerrarBodega(codigo);
-			
 		}
 
 		/**
