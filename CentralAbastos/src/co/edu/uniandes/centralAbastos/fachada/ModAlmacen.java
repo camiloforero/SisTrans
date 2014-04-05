@@ -213,7 +213,21 @@ public class ModAlmacen
 				
 		    }
 		    
-		/** Implementacion de requerimients 2.2-2.4 **/    
+		/** Implementacion de requerimients 2.2-2.4 **/ 
+		    
+		/**
+		 * 
+		 * @param idPedidoLocal
+		 * @param itemsExtraibles - tupalas de items de los cuales se van a sacar existencias. 
+		 * @return
+		 */
+		 public boolean moverExistenciasDeBodegaALocal(String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
+		 {
+			 // Consultar los items de el pedido local 
+			 ArrayList<ItemsPedidoLocal> 
+		 }
+		    
+		    
 ////   END  ////////////////////////////////////////////////////
 ///////////////// NUEVA IMPLEMENTACION V.1 END /////////////////////////
 ///////////////////////////////////////////////////////////////////
