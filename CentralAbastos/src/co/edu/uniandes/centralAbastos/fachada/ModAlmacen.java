@@ -224,7 +224,8 @@ public class ModAlmacen
 		 public boolean moverExistenciasDeBodegaALocal(String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
 		 {
 			 // Consultar los items de el pedido local 
-			 ArrayList<ItemsPedidoLocal> 
+			 //ArrayList<ItemsPedidoLocal> 
+			 return false;
 		 }
 		    
 		    

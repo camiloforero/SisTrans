@@ -279,7 +279,9 @@ public class CabAndes
 		  */
 		 public boolean enviarPedidosFromBodegasToLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
 		 {
-			 
+			 return false;
+			 //TODO					 
+				
 		 }
 		 
 		 // Iteracion # 3
