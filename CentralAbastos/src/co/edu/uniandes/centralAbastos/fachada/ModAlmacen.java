@@ -50,7 +50,7 @@ public class ModAlmacen
 			double capDisp = bod.getCapacidad() - bod.getCantidad_kg();
 			capDisp -= num_cajas*Wcaja;
 			if( capDisp >= 0 ){
-				dao.updateAlmacen(capDisp, bod.getCodigo()); // TODO : transaccionalidad 
+				dao.updateAlmacen(bod.getCantidad_kg()+num_cajas*Wcaja , bod.getCodigo()); // TODO : transaccionalidad 
 				dao.insertarEnInventario(pedidoEntrante.getProducto(), pedidoEntrante.getTipoProducto(), bod.getCodigo(), Wcaja, num_cajas, pedidoEntrante.getFechaExpiracion());
 				return true;
 			}
@@ -84,7 +84,7 @@ public class ModAlmacen
     	{
     		// Se almacena el pedido. 
     		for (ItemInventarioValue iiv : existenciasBodega) {
-   			 	resp = this.almacenarItemEnOtrasBodegas(iiv, bodegaToMod.getTipoProducto());
+   			 	resp = this.almacenarItemEnOtrasBodegasDesdeUnaBodega(iiv, bodegaToMod.getTipoProducto());
     		}
     	}
     	
@@ -98,7 +98,7 @@ public class ModAlmacen
 		     * @param tipoProductoBodega es el tipo de producto de la bodega que se va a cerrar, derrumbar, mantenimiento, etc.
 		     * @throws Exception 
 		     */
-		    private boolean almacenarItemEnOtrasBodegas(ItemInventarioValue item , String tipoProductoBodega) throws Exception
+		    private boolean almacenarItemEnOtrasBodegasDesdeUnaBodega(ItemInventarioValue item , String tipoProductoBodega) throws Exception
 		    {
 				int num_cajas = item.getCantidad();
 				double Wcajas = item.getPresentacion();
@@ -113,9 +113,9 @@ public class ModAlmacen
 						
 						int up = dao.updateCantidadCajas(item.getNomb_producto(), Wcajas, num_cajas, bod.getCodigo(), item.getFechaExp());
 						if(up == 0)
-							dao.updateDueñoExistencias(item, bod.getCodigo());
+							dao.insertarEnInventario(item.getNomb_producto(), tipoProductoBodega, bod.getCodigo(), Wcajas, num_cajas, item.getFechaExp())
 						
-						dao.updateAlmacen(d, bod.getCodigo());
+						dao.updateAlmacen( bod.getCantidad_kg()+num_cajas*Wcajas , bod.getCodigo());
 						
 						return true;
 					}
@@ -163,7 +163,7 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
-							dao.updateAlmacen(bodega.getCapacidad(), bodega.getCodigo()); // Esta 100% llena
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
 							
 							capRequeridaXcajas = r ;
 						}
@@ -173,7 +173,7 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
-							dao.updateAlmacen(bodega.getCapacidad() + capDisp_kg , bodega.getCodigo());
+							dao.updateAlmacen(bodega.getCantidad_kg() + capRequeridaXcajas*Wcajas , bodega.getCodigo());
 						}
 			    	}
 		    
@@ -194,7 +194,7 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((ItemInventarioValue) o).getFechaExp());
 							
-							dao.updateAlmacen(bodega.getCapacidad(), bodega.getCodigo()); // Esta 100% llena
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
 							
 							capRequeridaXcajas = r ;
 						}
@@ -204,7 +204,7 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((ItemInventarioValue) o).getFechaExp());
 							
-							dao.updateAlmacen(bodega.getCapacidad() + capDisp_kg , bodega.getCodigo());
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas , bodega.getCodigo());
 						}
 			    	}
 				}
@@ -224,7 +224,7 @@ public class ModAlmacen
 		 public boolean moverExistenciasDeBodegaALocal_I (String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
 		 {
 			 // Consultar los items de el pedido local 
-			 //ArrayList<ItemsPedidoLocal> 
+			 
 			 return false;
 		 }
 		    
