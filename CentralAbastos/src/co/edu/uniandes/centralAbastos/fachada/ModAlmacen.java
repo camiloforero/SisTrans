@@ -34,7 +34,7 @@ public class ModAlmacen
 	///////////////// NUEVA IMPLEMENTACION V.1 /////////////////////////
 	///////////////////////////////////////////////////////////////////
 	
-	// Iter 2 - req 3
+	// Iter 2 - req 2
 	/**
 	 * Req 2.1
 	 * Este metodo asigna un pedido entrante a las bodegas. 
@@ -111,7 +111,7 @@ public class ModAlmacen
 					if(d >= 0)
 					{
 						
-						int up = dao.updateCantidadCajas(item.getNomb_producto(), Wcajas, num_cajas, bod.getCodigo());
+						int up = dao.updateCantidadCajas(item.getNomb_producto(), Wcajas, num_cajas, bod.getCodigo(), item.getFechaExp());
 						if(up == 0)
 							dao.updateDueñoExistencias(item, bod.getCodigo());
 						
@@ -159,7 +159,7 @@ public class ModAlmacen
 						{
 							
 							// actualizo item_inventario en la bodega que cumple
-							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capDispXcajas, bodega.getCodigo());
+							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capDispXcajas, bodega.getCodigo(), ((PedidoEfectivoValue) o).getFechaExpiracion());
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
@@ -169,7 +169,7 @@ public class ModAlmacen
 						}
 						else // r<=0  
 						{
-							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capRequeridaXcajas , bodega.getCodigo());
+							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capRequeridaXcajas , bodega.getCodigo(),((PedidoEfectivoValue) o).getFechaExpiracion());
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
@@ -180,7 +180,7 @@ public class ModAlmacen
 				}
 				else //if ( o instanceof ItemInventarioValue)
 				{
-					o = (ItemInventarioValue) o;
+					o = ((ItemInventarioValue) o);
 					for (AlmacenValue bodega : bodegasDisponibles)
 			    	{
 						capDisp_kg = bodega.getCapacidad()-bodega.getCantidad_kg() ;
@@ -190,7 +190,7 @@ public class ModAlmacen
 						{
 							
 							// actualizo item_inventario en la bodega que cumple
-							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capDispXcajas, bodega.getCodigo());
+							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capDispXcajas, bodega.getCodigo(), ((ItemInventarioValue)o).getFechaExp());
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((ItemInventarioValue) o).getFechaExp());
 							
@@ -200,7 +200,7 @@ public class ModAlmacen
 						}
 						else // r<=0  
 						{
-							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capRequeridaXcajas , bodega.getCodigo());
+							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capRequeridaXcajas , bodega.getCodigo(),((ItemInventarioValue)o).getFechaExp() );
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((ItemInventarioValue) o).getFechaExp());
 							
@@ -213,8 +213,7 @@ public class ModAlmacen
 				
 		    }
 		    
-		    
-		    
+		/** Implementacion de requerimients 2.2-2.4 **/    
 ////   END  ////////////////////////////////////////////////////
 ///////////////// NUEVA IMPLEMENTACION V.1 END /////////////////////////
 ///////////////////////////////////////////////////////////////////

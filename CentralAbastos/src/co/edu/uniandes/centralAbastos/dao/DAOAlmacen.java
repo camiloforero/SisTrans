@@ -280,17 +280,18 @@ public class DAOAlmacen extends ConsultaDAO
 	
 	/**
 	 * Operacion que modifica la cantidad de cajas para una presentacion especifica de una bodega dada, en la tabla de item inventario
+	 * @param fechaExp 
 	 * @return El numero de columnas que modifico. 
 	 * 
 	 */
-	public int updateCantidadCajas(String nomb_producto, double wcajas, int cantidad_cajas, String codigoNuevaBodega)
+	public int updateCantidadCajas(String nomb_producto, double wcajas, int cantidad_cajas, String codigoNuevaBodega, String fechaExp)
 	{
 		PreparedStatement prepStmt = null;
 		
 		try {
 			
 			return super.ejecutarTask(" UPDATE item_inventario set cantidad = "+cantidad_cajas+" where nomb_producto = '"+nomb_producto+"' and peso_caja = '"+wcajas+"' "
-					+ " and cod_almacen = '"+codigoNuevaBodega+" '  " , prepStmt);
+					+ " and cod_almacen = '"+codigoNuevaBodega+" '  and fecha_expiracion='"+fechaExp+"'" , prepStmt);
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
