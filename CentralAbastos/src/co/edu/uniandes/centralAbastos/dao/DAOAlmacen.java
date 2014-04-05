@@ -86,7 +86,7 @@ public class DAOAlmacen extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO+=CANTIDAD_PRODUCTO"+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
+			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO="+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
 			
 		} catch (SQLException e) {
 			
