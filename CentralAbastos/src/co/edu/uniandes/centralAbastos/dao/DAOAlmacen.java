@@ -263,7 +263,7 @@ public class DAOAlmacen extends ConsultaDAO
 	/**
 	 * Operacion que cambia un elemento de inventario, de una bodega a otra. Puede cambiar de un local a otro pero aqui solo se utiliza con bodega.
 	 */
-	public void updateDueñoExistencias(String nombProducto, double presentacion, int cantidad, String codBodegaVieja, String codigoNuevaBodega)
+	public void updateDuenhoExistencias(String nombProducto, double presentacion, int cantidad, String codBodegaVieja, String codigoNuevaBodega)
 	{
 		PreparedStatement prepStmt = null;
 		try {

@@ -72,6 +72,8 @@ public class ConsultaDAO {
 	
 	private static final String correo = "CORREO"; 
 	
+	private static final String idPedido = "ID_PEDIDO"; 
+	
 	
 	
 
@@ -98,7 +100,7 @@ public class ConsultaDAO {
 													+ "FROM USUARIOS u LEFT JOIN COMPRADORES c ON u.CORREO = c.CORREO_USUARIO LEFT JOIN ADMIN_LOCAL a ON u.CORREO = a.CORREO_USUARIO LEFT JOIN PROVEEDORES p ON u.CORREO = p.CORREO_USUARIO";
 	
 	
-	
+	private static final String listaPedidosEfectivos = "SELECT ID_PEDIDO FROM BODEGAS WHERE FECHA_LLEGADA IS NULL";
 	
 	
 
@@ -336,6 +338,11 @@ public class ConsultaDAO {
     		consulta = listaUsuarios;
     		buscado = correo;    				
     	}
+    	else if(listaPedida.equals("pedidosEfectivos"))
+    	{
+    		consulta = listaPedidosEfectivos;
+    		buscado = idPedido;    				
+    	}
     	else if(listaPedida.startsWith("bodegas"))
     	{
     		System.out.println("entra");
@@ -350,6 +357,8 @@ public class ConsultaDAO {
     			consulta += "WHERE ESTADO = 'CERRADA'";
     		}
     	}
+    	else throw new Exception("string invalida");
+    
     			
     	
 		try {

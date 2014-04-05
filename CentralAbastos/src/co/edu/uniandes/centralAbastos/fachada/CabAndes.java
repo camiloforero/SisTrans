@@ -165,6 +165,12 @@ public class CabAndes
 		return dao.darListaSimple("usuarios");
 	}
 	
+	public ArrayList<String> darIdsPedidosEfectivos() throws Exception
+	{
+		ConsultaDAO dao = new ConsultaDAO(ruta);
+		return dao.darListaSimple("pedidosEfectivos");
+	}
+	
 	public ArrayList<ProductosValue> darResultadoBusquedaProductos(String parametros) throws Exception
 	{
 		DAOProducto dao = new DAOProducto(ruta);
@@ -186,6 +192,8 @@ public class CabAndes
 			respuesta.add(listaInicial.get(i).toArrayList());
 		return respuesta;
 	}
+	
+	
 
 	
 	
@@ -313,6 +321,9 @@ public class CabAndes
 		public static void main (String args[])
 		{
 			CabAndes cab = CabAndes.darInstancia();
+			ConsultaDAO dao = new ConsultaDAO("C:\\Users\\Camilo\\git\\SisTrans\\CentralAbastos\\WebContent");
+			dao.commit();
+			
 		}
 		 
 		 
