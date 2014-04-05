@@ -25,6 +25,7 @@ import java.util.Properties;
 
 
 
+
 import co.edu.uniandes.centralAbastos.vos.VideosValue;
 
 /**
@@ -433,6 +434,15 @@ public class ConsultaDAO {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}	
+   }
+   public void setAutocommit(boolean bol)
+   {
+	   try {
+		conexion.setAutoCommit(bol);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
    }
     
 }

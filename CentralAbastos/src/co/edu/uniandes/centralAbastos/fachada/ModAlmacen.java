@@ -113,7 +113,7 @@ public class ModAlmacen
 						
 						int up = dao.updateCantidadCajas(item.getNomb_producto(), Wcajas, num_cajas, bod.getCodigo(), item.getFechaExp());
 						if(up == 0)
-							dao.insertarEnInventario(item.getNomb_producto(), tipoProductoBodega, bod.getCodigo(), Wcajas, num_cajas, item.getFechaExp())
+							dao.insertarEnInventario(item.getNomb_producto(), tipoProductoBodega, bod.getCodigo(), Wcajas, num_cajas, item.getFechaExp());
 						
 						dao.updateAlmacen( bod.getCantidad_kg()+num_cajas*Wcajas , bod.getCodigo());
 						

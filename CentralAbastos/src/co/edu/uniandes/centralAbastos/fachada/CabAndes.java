@@ -275,7 +275,7 @@ public class CabAndes
 		 
 		 public boolean enviarPedidoAlLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
 		 {
-			 
+			 return false;
 		 }
 		 
 		 // Iteracion # 3
@@ -310,7 +310,10 @@ public class CabAndes
 			
 		}
 		 
-		 
+		public static void main (String args[])
+		{
+			CabAndes cab = CabAndes.darInstancia();
+		}
 		 
 		 
 	 
