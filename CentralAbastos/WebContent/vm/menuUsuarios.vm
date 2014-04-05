@@ -17,4 +17,7 @@
 	<tr>
 		<td><a href="verProveedores.htm">Ver proveedores</a></td>
 	</tr>
+	<tr>
+		<td><a href="registrarEntregaProveedor.htm">Registrar entrega proveedor</a></td>
+	</tr>
 </table>

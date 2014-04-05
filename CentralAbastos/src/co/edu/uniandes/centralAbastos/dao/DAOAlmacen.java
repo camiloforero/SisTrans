@@ -17,6 +17,7 @@ public class DAOAlmacen extends ConsultaDAO
 	 * 
 	 */
 	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN "; 
+	public final static String ALL_BODEGA_INFO = "SELECT * FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN "; 
 	
 	public final static String ITEMS_INVENTARIO = "select ii.* from item_inventario ii ";
 	
@@ -347,5 +348,30 @@ public class DAOAlmacen extends ConsultaDAO
 	
 		return false;
 	
+	}
+
+	public ArrayList<AlmacenValue> darInformacionBodegas() 
+	{
+		PreparedStatement prepStmt = null;
+		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
+		
+		try {
+		
+			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
+			
+			while(rs.next()){
+				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
 	}
 }
