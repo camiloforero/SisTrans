@@ -209,7 +209,8 @@ public class CabAndes
 		return modAlmacen.eliminarBodega(codigo);
 	}
 	
-	//------------------- metodos pedro --------------------------------
+	//------------------- ITERACION #2 --------------------------------
+	
 	/**
 	 * 
 	 * @return Arraylist con los pedidos de oferta que ya estan cerrados y 
@@ -242,8 +243,11 @@ public class CabAndes
 		 return pev;
 	 }
 	 
-	 	 /**
-		  * Registra la entrega de un proveedor. 
+	 
+	 	// ----- Requerimiento # 3 : Registrar movimientos -----
+	 	
+	 /**
+		  * Registra la entrega de un proveedor. (RF 3.1)
 		  * @param idPedidoEfectivo
 		  * @throws Exception
 		  */
@@ -265,6 +269,15 @@ public class CabAndes
 			 
 		 }
 		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 // Iteracion # 3
 		 /**
 		  * Asigna el pedido a bodegas.
 		  */

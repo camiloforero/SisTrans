@@ -23,6 +23,8 @@ import java.util.Properties;
 
 
 
+
+
 import co.edu.uniandes.centralAbastos.vos.VideosValue;
 
 /**
@@ -225,12 +227,12 @@ public class ConsultaDAO {
      * @throws SQLException 
      * @throws Exception
      */
-    public boolean ejecutarTask(String statement, PreparedStatement prepStmt) throws SQLException
+    public int ejecutarTask(String statement, PreparedStatement prepStmt) throws SQLException
     {
     	
     	establecerConexion(cadenaConexion, usuario, clave);
 		prepStmt = conexion.prepareStatement(statement);
-		return prepStmt.execute();
+		return prepStmt.executeUpdate();
     }
     
     public void cerrarConexion(PreparedStatement prepStmt) throws Exception
@@ -410,6 +412,27 @@ public class ConsultaDAO {
 		return respuesta;
 	}
     
+	/**
+	 * Hace commit
+	 */
+   public void commit()
+   {
+		   try {
+			conexion.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+   }
    
+   public void rollback()
+   {
+	   try {
+		conexion.rollback();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}	
+   }
     
 }

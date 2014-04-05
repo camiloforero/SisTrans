@@ -4,8 +4,17 @@ import java.util.ArrayList;
 
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
+import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 
+/**
+ * @author Personal
+ *
+ */
+/**
+ * @author Personal
+ *
+ */
 public class ModAlmacen 
 {
 	
@@ -21,77 +30,221 @@ public class ModAlmacen
 		return dao.agregarBodega(value);
 	}
 	
-	void asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
-	 {
-		 double porc_min_almacenaje = 0.1; // es el porcentaje minimo en el cual se puede dividir el pedido para almacenar en distintas bodegas.
-		 
-		//meter lo que mas se pueda en bodegas llenas
+	////////////////////////////////////////////////////////////////////
+	///////////////// NUEVA IMPLEMENTACION V.1 /////////////////////////
+	///////////////////////////////////////////////////////////////////
+	
+	// Iter 2 - req 2
+	/**
+	 * Req 2.1
+	 * Este metodo asigna un pedido entrante a las bodegas. 
+	 * @param pedidoEntrante
+	 * @throws Exception
+	 */
+	public boolean asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
+	{
 		int num_cajas = pedidoEntrante.getCantidad();
-		double Wcajas = pedidoEntrante.getPresentacion();
-		ArrayList<AlmacenValue> bodegasDisponibles = dao.darBodegasXTipo(pedidoEntrante.getTipoProducto());
-		ArrayList<AlmacenValue> bodegas_vacias = new ArrayList<AlmacenValue>();
-		for (AlmacenValue bod : bodegasDisponibles) {
+		double Wcaja = pedidoEntrante.getPresentacion();
+		ArrayList<AlmacenValue> bodegasDisp = dao.darBodegasXTipo(pedidoEntrante.getTipoProducto()); // TODO : transaccionalidad "Select for update para evitar lecturas sucias"
+		for (AlmacenValue bod : bodegasDisp) {
+			double capDisp = bod.getCapacidad() - bod.getCantidad_kg();
+			capDisp -= num_cajas*Wcaja;
+			if( capDisp >= 0 ){
+				dao.updateAlmacen(capDisp, bod.getCodigo()); // TODO : transaccionalidad 
+				dao.insertarEnInventario(pedidoEntrante.getProducto(), pedidoEntrante.getTipoProducto(), bod.getCodigo(), Wcaja, num_cajas, pedidoEntrante.getFechaExpiracion());
+				return true;
+			}
+		}
+		
+		// parte el pedido y lo almacena en distintas bodegas donde vaya encontrando espacio 
+		
+		
+		return false;
+	}
+	
+	// Iter 3  
+	/**
+	 * Apoyo a req 1 y 2. <br>
+	 * 
+	 * Reasigna las existencias de un almacen especificado por parametro. Este trata de resignarlas todas. <br>
+	 * @pre: El codigo del almacen debe ser el de una bodega.
+	 * @param codBodega 
+	 * @return  falso si no tiene espacio para reasignarlas o verdadero dlc.
+	 * @throws Exception 
+	 */
+    private boolean reasignarExistencias(String codBodega) throws Exception
+	{
+		
+    	AlmacenValue bodegaToMod = dao.darBodega(codBodega);
+    	ArrayList<ItemInventarioValue> existenciasBodega = dao.darExistenciasDeUnaBodega(codBodega); // TODO interacciones transaccionalidad
+    	
+    	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega); 
+    	boolean resp = false;
+    	if( capTotalDisp >= bodegaToMod.getCantidad_kg() ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
+    	{
+    		// Se almacena el pedido. 
+    		for (ItemInventarioValue iiv : existenciasBodega) {
+   			 	resp = this.almacenarItemEnOtrasBodegas(iiv, bodegaToMod.getTipoProducto());
+    		}
+    	}
+    	
+    	return resp;
+	}
+   
+	// metodo de apoyo para el de arriba
+		    /**
+		     * Almacena un item inventario en bodegas, utilizando la misma politica para asignarBodegas a un pedido entrane
+		     * @param item
+		     * @param tipoProductoBodega es el tipo de producto de la bodega que se va a cerrar, derrumbar, mantenimiento, etc.
+		     * @throws Exception 
+		     */
+		    private boolean almacenarItemEnOtrasBodegas(ItemInventarioValue item , String tipoProductoBodega) throws Exception
+		    {
+				int num_cajas = item.getCantidad();
+				double Wcajas = item.getPresentacion();
+				
+				// trata de almacenarlo simplemente buscando donde cabe y listo.
+				ArrayList<AlmacenValue> bodegasDisponibles = dao.darBodegasXTipo(tipoProductoBodega);
+				
+				for (AlmacenValue bod : bodegasDisponibles) {
+					double d = (bod.getCapacidad()-bod.getCantidad_kg()) - num_cajas*Wcajas;
+					if(d >= 0)
+					{
+						
+						int up = dao.updateCantidadCajas(item.getNomb_producto(), Wcajas, num_cajas, bod.getCodigo(), item.getFechaExp());
+						if(up == 0)
+							dao.updateDueñoExistencias(item, bod.getCodigo());
+						
+						dao.updateAlmacen(d, bod.getCodigo());
+						
+						return true;
+					}
+				}
+				
+				/**  */
+				double d = this.almacenarEnDistintasBodegas(item, bodegasDisponibles, num_cajas, Wcajas);
+				if(d >= 5.0) // tratar de almacenar de nuevo. Se pueden perder un numero maximo de kilos que se definen en el if.
+					return true; // La idea es que vuelva a almacenar hasta reducir a una tolerancia.
+					
+				return false;
+				
+		    }
+		    
+		    
+		    /**
+		     * Almacena un objeto en distintas bodegas. Especificamente el metodo toma un grupo de bodegas disponibles y a cada una le agrega una parte del producto en items, ya sea proveniente de un pedidoEntrante o de un ItemInventario 
+		     * <br> @pre : Solo sirve si la regla sobre el parametro o se cumple.
+		     * @param o - es un objeto in  {PedidoEfectivoValue , ItemInventario}
+		     * @param bodegasDisponibles
+		     * @param num_cajas
+		     * @param Wcajas
+		     * @throws Exception
+		     * @return - El numero de cajas de "Wcajas" kg que faltaron por almacenar. En caso de que no se cupla la pre, retorna el numero -10000.0
+		     */
+    
+		    private double almacenarEnDistintasBodegas(Object o , ArrayList<AlmacenValue> bodegasDisponibles, int num_cajas, double Wcajas ) throws Exception
+		    {
+		    	int capRequeridaXcajas = num_cajas; // Numero de cajas donde hay espacio
+				double capDisp_kg = -10000.0 ;
+				
+		    	if(o instanceof PedidoEfectivoValue)
+				{	
+					o = (PedidoEfectivoValue) o;
+			    	for (AlmacenValue bodega : bodegasDisponibles)
+			    	{
+						capDisp_kg = bodega.getCapacidad()-bodega.getCantidad_kg() ;
+						int capDispXcajas = (int) ( capDisp_kg/Wcajas ) ;
+						int r = capRequeridaXcajas-capDispXcajas; // Espacio disponible en terminos de cajas con presentacion Wcajas
+						if( r > 0 )
+						{
+							
+							// actualizo item_inventario en la bodega que cumple
+							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capDispXcajas, bodega.getCodigo(), ((PedidoEfectivoValue) o).getFechaExpiracion());
+							if(up == 0)
+								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((PedidoEfectivoValue) o).getFechaExpiracion());
+							
+							dao.updateAlmacen(bodega.getCapacidad(), bodega.getCodigo()); // Esta 100% llena
+							
+							capRequeridaXcajas = r ;
+						}
+						else // r<=0  
+						{
+							int up = dao.updateCantidadCajas(((PedidoEfectivoValue) o).getProducto() , Wcajas, capRequeridaXcajas , bodega.getCodigo(),((PedidoEfectivoValue) o).getFechaExpiracion());
+							if(up == 0)
+								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((PedidoEfectivoValue) o).getFechaExpiracion());
+							
+							dao.updateAlmacen(bodega.getCapacidad() + capDisp_kg , bodega.getCodigo());
+						}
+			    	}
+		    
+				}
+				else //if ( o instanceof ItemInventarioValue)
+				{
+					o = ((ItemInventarioValue) o);
+					for (AlmacenValue bodega : bodegasDisponibles)
+			    	{
+						capDisp_kg = bodega.getCapacidad()-bodega.getCantidad_kg() ;
+						int capDispXcajas = (int) ( capDisp_kg/Wcajas) ;
+						int r = capRequeridaXcajas-capDispXcajas; // Espacio disponible en terminos de cajas con presentacion Wcajas
+						if( r > 0 )
+						{
+							
+							// actualizo item_inventario en la bodega que cumple
+							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capDispXcajas, bodega.getCodigo(), ((ItemInventarioValue)o).getFechaExp());
+							if(up == 0)
+								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((ItemInventarioValue) o).getFechaExp());
+							
+							dao.updateAlmacen(bodega.getCapacidad(), bodega.getCodigo()); // Esta 100% llena
+							
+							capRequeridaXcajas = r ;
+						}
+						else // r<=0  
+						{
+							int up = dao.updateCantidadCajas(((ItemInventarioValue) o).getNomb_producto() , Wcajas, capRequeridaXcajas , bodega.getCodigo(),((ItemInventarioValue)o).getFechaExp() );
+							if(up == 0)
+								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((ItemInventarioValue) o).getFechaExp());
+							
+							dao.updateAlmacen(bodega.getCapacidad() + capDisp_kg , bodega.getCodigo());
+						}
+			    	}
+				}
 			
-			double cap_disponible = bod.getCapacidad()-bod.getCantidad_kg();
-			int num_cajas_disponible = (int) (cap_disponible/Wcajas);
-			if(cap_disponible > 0 && num_cajas_disponible >= (int)(porc_min_almacenaje*num_cajas) && bod.getCantidad_kg()>0 ) // bodega sin llenar por completo y con espacio para guardar un porcentaje minimo del pedido
-			{
-				int diff = num_cajas-num_cajas_disponible;
-				double x = diff*Wcajas;
-				if(diff > 0) // mete solo diff.
-				{
-					dao.updateAlmacen(x);
-					dao.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas , (num_cajas- diff) , pedidoEntrante.getFechaExpiracion() );
-					num_cajas=diff;
-				}
-				else // metelas todas
-				{
-					dao.updateAlmacen( num_cajas*Wcajas );
-					dao.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas, (num_cajas), pedidoEntrante.getFechaExpiracion() );
-					break;
-				}
-			}
-			else if(cap_disponible == bod.getCapacidad())
-				bodegas_vacias.add(bod);
-		}
-		
-		//meter lo que me queda en bodegas vacias.
-		for (AlmacenValue bod : bodegas_vacias) {
-			double cap_disponible = bod.getCapacidad()-bod.getCantidad_kg();
-			int num_cajas_disponible = (int) (cap_disponible/Wcajas);
-			int diff = num_cajas-num_cajas_disponible;
-			double x = diff*Wcajas;
-			if(diff > 0) // mete solo diff.
-			{
-				dao.updateAlmacen(x);
-				dao.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas , (num_cajas- diff) , pedidoEntrante.getFechaExpiracion() );
-				num_cajas=diff;
-			}
-			else // metelas todas
-			{
-				dao.updateAlmacen( num_cajas*Wcajas );
-				dao.insertarEnInventario(pedidoEntrante.getProducto() , bod.getCodigo() , Wcajas, (num_cajas), pedidoEntrante.getFechaExpiracion() );
-				break;
-			}
-		}
-		
-	 }
-
+				return capDisp_kg;
+				
+		    }
+		    
+		/** Implementacion de requerimients 2.2-2.4 **/    
+////   END  ////////////////////////////////////////////////////
+///////////////// NUEVA IMPLEMENTACION V.1 END /////////////////////////
+///////////////////////////////////////////////////////////////////
+    /**
+     * 
+     * @param codigo
+     * @return
+     * @throws Exception
+     */
 	public boolean eliminarBodega(String codigo) throws Exception
 	{
-		return dao.eliminarBodega(codigo);
+		// modificado para que incluya lo el movimiento de existencias
+		boolean r = this.reasignarExistencias(codigo);
+		return dao.eliminarBodega(codigo) && r ;
 	}
 
-	public void cerrarBodega(String codigo) throws Exception 
+	public boolean cerrarBodega(String codigo) throws Exception 
 	{
-		dao.cerrarBodega(codigo);
-		
+		// modificado para que incluya lo el movimiento de existencias
+		boolean resp = this.reasignarExistencias(codigo);
+		if(resp)
+		{
+			dao.cerrarBodega(codigo);
+			return true;
+		}
+		else 
+			return false;
 	}
-
 	public void abrirBodega(String codigo) throws Exception
 	{
 		dao.abrirBodega(codigo);
-		
 	}
 
 }

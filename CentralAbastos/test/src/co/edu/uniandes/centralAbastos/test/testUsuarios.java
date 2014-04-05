@@ -1,5 +1,6 @@
 package co.edu.uniandes.centralAbastos.test;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
@@ -124,6 +125,16 @@ public class testUsuarios extends TestCase
 		}
 	}
 	
+	public void testProof()
+	{
+		dao = new DAOTest();
+		try {
+			dao.x();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
-
+    
 }
