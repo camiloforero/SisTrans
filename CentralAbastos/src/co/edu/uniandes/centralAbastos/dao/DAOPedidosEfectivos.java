@@ -142,7 +142,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	public void updateValoresProveedor(String correoProveedor,int calificacion) throws SQLException
 	{
 		PreparedStatement prepStmt = null;
-		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1", prepStmt);
+		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1" , prepStmt);
 	}
 	
 	

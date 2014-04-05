@@ -86,7 +86,7 @@ public class DAOAlmacen extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO="+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
+			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO+=CANTIDAD_PRODUCTO"+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
 			
 		} catch (SQLException e) {
 			
@@ -263,13 +263,13 @@ public class DAOAlmacen extends ConsultaDAO
 	/**
 	 * Operacion que cambia un elemento de inventario, de una bodega a otra. Puede cambiar de un local a otro pero aqui solo se utiliza con bodega.
 	 */
-	public void updateDueñoExistencias(ItemInventarioValue item, String codigoNuevaBodega)
+	public void updateDueñoExistencias(String nombProducto, double presentacion, int cantidad, String codBodegaVieja, String codigoNuevaBodega)
 	{
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask(" UPDATE item_inventario set cod_almacen = '"+codigoNuevaBodega+"' where nomb_producto = '"+item.getNomb_producto()+"' and peso_caja = '"+item.getPresentacion()+"' "
-					+ " and cantidad = '"+item.getCantidad()+" ' and cod_almacen = '"+item.getCod_almacen()+" '  "
+			super.ejecutarTask(" UPDATE item_inventario set cod_almacen = '"+codigoNuevaBodega+"' where nomb_producto = '"+nombProducto+"' and peso_caja = '"+presentacion+"' "
+					+ " and cantidad = '"+cantidad+" ' and cod_almacen = '"+codBodegaVieja+" '  "
 					, prepStmt);
 			
 		} catch (SQLException e) {

@@ -70,8 +70,7 @@ Autor: Juan Diego Toro
 		</copy>
 		
 		<jar destfile="${data}/WEB-INF/lib/vm.jar"
-		       basedir="${data}/vm"
-		  />
+		       basedir="${data}/vm" />
 		
 		<!-- Empaqueta las clases en un WAR -->
 		<jar jarfile="${dist}/${war}">

@@ -279,7 +279,12 @@ public class CabAndes
 		  */
 		 public boolean enviarPedidosFromBodegasToLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
 		 {
-			 
+			 return false;
+			 //TODO					 
+				
+		 } false;
+			 //TODO					 
+				
 		 }
 		 
 		 // Iteracion # 3
@@ -289,6 +294,7 @@ public class CabAndes
 		 private void asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
 		 {
 			 modAlmacen.asignarEnBodegas(pedidoEntrante);
+		 }ignarEnBodegas(pedidoEntrante);
 		 }
 
 		/**

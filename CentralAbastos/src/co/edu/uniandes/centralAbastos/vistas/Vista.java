@@ -55,14 +55,14 @@ public abstract class Vista
 	 * @param nombre
 	 * @param data
 	 */
-	public void put(String nombre, Collection data)
+	public void put(String nombre, Object data)
 	{
 		context.put(nombre, data);
 	}
 	
 	/**
-	 * Imprime la vista</br>
-	 * <b>pre: <b>Todas los iterables necesarios para generar la página están dentro del contexto, y se ha seleccionado un template </br>
+	 * Imprime la vista, asignandole un template </br>
+	 * <b>pre: <b>Todas las collections necesarias para generar la página están dentro del contexto, y se ha seleccionado un template </br>
 	 * <b>post: <b> La página web se ha escrito en el PrintWriter del servlet
 	 * @param respuesta: PrintWriter del servlet donde se escribe el contenido HTML
 	 */

@@ -221,10 +221,11 @@ public class ModAlmacen
 		 * @param itemsExtraibles - tupalas de items de los cuales se van a sacar existencias. 
 		 * @return
 		 */
-		 public boolean moverExistenciasDeBodegaALocal(String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
+		 public boolean moverExistenciasDeBodegaALocal_I (String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
 		 {
 			 // Consultar los items de el pedido local 
-			 ArrayList<ItemsPedidoLocal> 
+			 //ArrayList<ItemsPedidoLocal> 
+			 return false;
 		 }
 		    
 		    
