@@ -182,7 +182,7 @@ public class CabAndes
 		return respuesta;
 	}
 	
-	public ArrayList<ArrayList<String>> darInformacionBodegas()
+	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
 		return dao.darInformacionBodegas();
@@ -276,11 +276,8 @@ public class CabAndes
 		 // Req 2.2-2.4 Iter 2
 		
 		 
-<<<<<<< HEAD
+
 		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp )
-=======
-		 public boolean enviarPedidoAlLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
->>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 		 {
 			 return false;
 		 }
