@@ -273,9 +273,9 @@ public class CabAndes
 		 // Req 2.2-2.4 Iter 2
 		
 		 
-		 public boolean enviarPedidoAlLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
+		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp )
 		 {
-			 
+			 return false;
 		 }
 		 
 		 // Iteracion # 3

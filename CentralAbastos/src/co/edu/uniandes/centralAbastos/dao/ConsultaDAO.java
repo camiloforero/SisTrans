@@ -427,12 +427,13 @@ public class ConsultaDAO {
    
    public void rollback()
    {
-	   try {
-		conexion.rollback();
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}	
+		   try {
+			conexion.rollback();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
    }
     
+ 
 }

@@ -1,5 +1,6 @@
 package co.edu.uniandes.centralAbastos.dao;
 
+import java.nio.charset.CodingErrorAction;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,14 +59,19 @@ public class DAOAlmacen extends ConsultaDAO
 		return null;
 	}
 	
-	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd) throws Exception
+	/**
+	 * Retorna las bodegas de un tipo, exceptuando la bodega con codBodegaExc
+	 * @param tipoProd
+	 * @return
+	 */
+	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd, String codBodegaExc ) throws Exception
 	{
 		PreparedStatement prepStmt = null;
 		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
 		
 		try {
 		
-			ResultSet rs = super.hacerQuery( ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' ", prepStmt);
+			ResultSet rs = super.hacerQuery( ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " , prepStmt);
 			
 			while(rs.next()){
 				
@@ -86,7 +92,7 @@ public class DAOAlmacen extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO="+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
+			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO=CANTIDAD_PRODUCTO"+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
 			
 		} catch (SQLException e) {
 			
@@ -290,7 +296,7 @@ public class DAOAlmacen extends ConsultaDAO
 		
 		try {
 			
-			return super.ejecutarTask(" UPDATE item_inventario set cantidad = "+cantidad_cajas+" where nomb_producto = '"+nomb_producto+"' and peso_caja = '"+wcajas+"' "
+			return super.ejecutarTask(" UPDATE item_inventario set cantidad = cantidad+ "+cantidad_cajas+" where nomb_producto = '"+nomb_producto+"' and peso_caja = '"+wcajas+"' "
 					+ " and cod_almacen = '"+codigoNuevaBodega+" '  and fecha_expiracion='"+fechaExp+"'" , prepStmt);
 			
 		} catch (SQLException e) {
@@ -348,4 +354,31 @@ public class DAOAlmacen extends ConsultaDAO
 		return false;
 	
 	}
+	
+	/**
+	 * 
+	 * @param producto
+	 * @return tipo de un producto.
+	 */
+	public String darTipoProducto(String producto)
+	{
+		String qq = 
+				" Select tipo from productos where nombre = '"+producto+"' ";
+		PreparedStatement ps = null;
+		
+		try{
+			ResultSet rs = super.hacerQuery(qq, ps);
+			if(rs.next())
+				return rs.getString(1);
+		}
+		catch (SQLException e)
+		{
+			
+		}
+		
+		return "";
+	}
+	/////////////////////////////////// Consultas al ip
+	
+	
 }
