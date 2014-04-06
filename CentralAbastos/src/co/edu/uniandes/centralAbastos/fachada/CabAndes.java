@@ -182,6 +182,13 @@ public class CabAndes
 		return respuesta;
 	}
 	
+	/**
+	 * Retorna una ArrayList que contiene más ArrayLists, las cuales contienen información sobre una bodega.</br>
+	 * <b>pre: <b> </br>
+	 * <b>post: <b>
+	 * @return
+	 * @throws Exception
+	 */
 	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
