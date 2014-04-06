@@ -65,6 +65,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			super.ejecutarTask( " UPDATE PEDIDO_EFECTIVO SET FECHA_LLEGADA=' "+df.format(today)+" ' WHERE ID_PEDIDO = ' "+idPedidoEfectivo+" '"
 					, prepStmt);
 			
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

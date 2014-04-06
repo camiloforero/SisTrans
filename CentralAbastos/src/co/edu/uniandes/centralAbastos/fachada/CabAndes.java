@@ -185,7 +185,10 @@ public class CabAndes
 	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
-		return dao.darInformacionBodegas();
+		ArrayList<ArrayList<String>> respuesta = new ArrayList<ArrayList<String>>();
+		for(AlmacenValue av : dao.darInformacionBodegas())
+			respuesta.add(av.toArrayList());
+		return respuesta;
 	}
 	
 	
@@ -276,7 +279,8 @@ public class CabAndes
 		 // Req 2.2-2.4 Iter 2
 		
 		 
-		 public boolean enviarPedidoAlLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
+
+		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp )
 		 {
 			 return false;
 		 }
