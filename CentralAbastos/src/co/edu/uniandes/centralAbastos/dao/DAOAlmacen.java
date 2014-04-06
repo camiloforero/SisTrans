@@ -355,9 +355,9 @@ public class DAOAlmacen extends ConsultaDAO
 		return false;
 	
 	}
-}
 
-	public ArrayList<AlmacenValue> darInformacionBodegas() 
+
+	public ArrayList<AlmacenValue> darInformacionBodegas() throws Exception
 	{
 		PreparedStatement prepStmt = null;
 		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
@@ -381,57 +381,9 @@ public class DAOAlmacen extends ConsultaDAO
 	
 		return a;
 	}
-				val.setEstado("B.ESTADO");
-				a.add(val);
 				
-			}
-	
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			super.cerrarConexion(prepStmt);
-		}
-	
-		return a;
-	}CIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
-				val.setEstado("B.ESTADO");
-				a.add(val);
-				
-			}
-	
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			super.cerrarConexion(prepStmt);
-		}
-	
-		return a;
-	}
 
-	public ArrayList<AlmacenValue> darInformacionBodegas() 
-	{
-		PreparedStatement prepStmt = null;
-		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
-		
-		try {
-		
-			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
-			
-			while(rs.next()){
-				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
-				val.setEstado("B.ESTADO");
-				a.add(val);
-				
-			}
 	
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			super.cerrarConexion(prepStmt);
-		}
-	
-		return a;
-	}
 	
 	/**
 	 * 
@@ -460,28 +412,5 @@ public class DAOAlmacen extends ConsultaDAO
 	
 	
 
-	public ArrayList<AlmacenValue> darInformacionBodegas() 
-	{
-		PreparedStatement prepStmt = null;
-		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
-		
-		try {
-		
-			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
-			
-			while(rs.next()){
-				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
-				val.setEstado("B.ESTADO");
-				a.add(val);
-				
-			}
 	
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			super.cerrarConexion(prepStmt);
-		}
-	
-		return a;
-	}
 }
