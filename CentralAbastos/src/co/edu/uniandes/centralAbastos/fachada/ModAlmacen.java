@@ -50,7 +50,11 @@ public class ModAlmacen
 			double capDisp = bod.getCapacidad() - bod.getCantidad_kg();
 			capDisp -= num_cajas*Wcaja;
 			if( capDisp >= 0 ){
+<<<<<<< HEAD
 				dao.updateAlmacen(num_cajas*Wcaja , bod.getCodigo()); // TODO : transaccionalidad 
+=======
+				dao.updateAlmacen(bod.getCantidad_kg()+num_cajas*Wcaja , bod.getCodigo()); // TODO : transaccionalidad 
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 				dao.insertarEnInventario(pedidoEntrante.getProducto(), pedidoEntrante.getTipoProducto(), bod.getCodigo(), Wcaja, num_cajas, pedidoEntrante.getFechaExpiracion());
 				return true;
 			}
@@ -115,7 +119,11 @@ public class ModAlmacen
 						if(up == 0)
 							dao.insertarEnInventario(item.getNomb_producto(), tipoProductoBodega, bod.getCodigo(), Wcajas, num_cajas, item.getFechaExp());
 						
+<<<<<<< HEAD
 						dao.updateAlmacen( num_cajas*Wcajas , bod.getCodigo());
+=======
+						dao.updateAlmacen( bod.getCantidad_kg()+num_cajas*Wcajas , bod.getCodigo());
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 						
 						return true;
 					}
@@ -163,9 +171,15 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
+<<<<<<< HEAD
 							dao.updateAlmacen(capDispXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
 							capRequeridaXcajas = r;
 							 
+=======
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
+							
+							capRequeridaXcajas = r ;
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 						}
 						else // r<=0  
 						{
@@ -173,8 +187,12 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((PedidoEfectivoValue) o).getProducto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((PedidoEfectivoValue) o).getFechaExpiracion());
 							
+<<<<<<< HEAD
 							dao.updateAlmacen( capRequeridaXcajas*Wcajas , bodega.getCodigo());
 							break;
+=======
+							dao.updateAlmacen(bodega.getCantidad_kg() + capRequeridaXcajas*Wcajas , bodega.getCodigo());
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 						}
 			    	}
 		    
@@ -195,7 +213,11 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas, capDispXcajas, ((ItemInventarioValue) o).getFechaExp());
 							
+<<<<<<< HEAD
 							dao.updateAlmacen(capDispXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
+=======
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas, bodega.getCodigo()); // Esta 100% llena
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 							
 							capRequeridaXcajas = r ;
 						}
@@ -205,8 +227,12 @@ public class ModAlmacen
 							if(up == 0)
 								dao.insertarEnInventario(((ItemInventarioValue) o).getNomb_producto(),bodega.getTipoProducto(), bodega.getCodigo(), Wcajas , capRequeridaXcajas , ((ItemInventarioValue) o).getFechaExp());
 							
+<<<<<<< HEAD
 							dao.updateAlmacen(capRequeridaXcajas*Wcajas , bodega.getCodigo());
 							break;
+=======
+							dao.updateAlmacen(bodega.getCantidad_kg()+capRequeridaXcajas*Wcajas , bodega.getCodigo());
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 						}
 			    	}
 				}
@@ -216,6 +242,7 @@ public class ModAlmacen
 		    }
 		    
 		/** Implementacion de requerimients 2.2-2.4 **/ 
+<<<<<<< HEAD
 		
 		    // Req 2.2
 		    /**
@@ -230,6 +257,21 @@ public class ModAlmacen
 		    {
 		    	int up = dao.updateCantidadCajas(producto, pesoCaja, -cajasSolicitadas ,idBodega,fechaExpProducto);	
 		    }
+=======
+		    
+		/**
+		 * 
+		 * @param idPedidoLocal
+		 * @param itemsExtraibles - tupalas de items de los cuales se van a sacar existencias. 
+		 * @return
+		 */
+		 public boolean moverExistenciasDeBodegaALocal_I (String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
+		 {
+			 // Consultar los items de el pedido local 
+			 
+			 return false;
+		 }
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 		    
 		    
 ////   END  ////////////////////////////////////////////////////

@@ -108,6 +108,18 @@
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletVerProveedores</servlet-class>
  </servlet>
  
+ <servlet>
+  <display-name>ServletRegistrarEntregaProveedor</display-name>
+  <servlet-name>ServletRegistrarEntregaProveedor</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletRegistrarEntregaProveedor</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletResultadoRegistrarEntregaProveedor</display-name>
+  <servlet-name>ServletResultadoRegistrarEntregaProveedor</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoRegistrarEntregaProveedor</servlet-class>
+ </servlet>
+ 
  <!--===XxX===xXx===XxX===xXx===== Servlet Mappings =====xXx===XxX===xXx===XxX===-->
   
  <servlet-mapping>
@@ -193,6 +205,16 @@
   <servlet-mapping>
   <servlet-name>ServletVerProveedores</servlet-name>
   <url-pattern>/verProveedores.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletRegistrarEntregaProveedor</servlet-name>
+  <url-pattern>/registrarEntregaProveedor.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletResultadoRegistrarEntregaProveedor</servlet-name>
+  <url-pattern>/resultadoRegistrarEntregaProveedor.htm</url-pattern>
  </servlet-mapping>
  
 </web-app>

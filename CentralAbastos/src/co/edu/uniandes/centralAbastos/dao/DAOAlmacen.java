@@ -18,6 +18,7 @@ public class DAOAlmacen extends ConsultaDAO
 	 * 
 	 */
 	public final static String ALL_BODEGAS = "SELECT A.* FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN "; 
+	public final static String ALL_BODEGA_INFO = "SELECT * FROM ALMACEN A JOIN BODEGAS B ON A.CODIGO=B.COD_ALMACEN "; 
 	
 	public final static String ITEMS_INVENTARIO = "select ii.* from item_inventario ii ";
 	
@@ -269,7 +270,7 @@ public class DAOAlmacen extends ConsultaDAO
 	/**
 	 * Operacion que cambia un elemento de inventario, de una bodega a otra. Puede cambiar de un local a otro pero aqui solo se utiliza con bodega.
 	 */
-	public void updateDueñoExistencias(String nombProducto, double presentacion, int cantidad, String codBodegaVieja, String codigoNuevaBodega)
+	public void updateDuenhoExistencias(String nombProducto, double presentacion, int cantidad, String codBodegaVieja, String codigoNuevaBodega)
 	{
 		PreparedStatement prepStmt = null;
 		try {
@@ -354,6 +355,83 @@ public class DAOAlmacen extends ConsultaDAO
 		return false;
 	
 	}
+}
+
+	public ArrayList<AlmacenValue> darInformacionBodegas() 
+	{
+		PreparedStatement prepStmt = null;
+		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
+		
+		try {
+		
+			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
+			
+			while(rs.next()){
+				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
+	}
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
+	}CIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
+	}
+
+	public ArrayList<AlmacenValue> darInformacionBodegas() 
+	{
+		PreparedStatement prepStmt = null;
+		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
+		
+		try {
+		
+			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
+			
+			while(rs.next()){
+				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
+	}
 	
 	/**
 	 * 
@@ -381,4 +459,29 @@ public class DAOAlmacen extends ConsultaDAO
 	/////////////////////////////////// Consultas al ip
 	
 	
+
+	public ArrayList<AlmacenValue> darInformacionBodegas() 
+	{
+		PreparedStatement prepStmt = null;
+		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
+		
+		try {
+		
+			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
+			
+			while(rs.next()){
+				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
+				val.setEstado("B.ESTADO");
+				a.add(val);
+				
+			}
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			super.cerrarConexion(prepStmt);
+		}
+	
+		return a;
+	}
 }

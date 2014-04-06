@@ -94,17 +94,6 @@ public class CabAndes
     // M�todos asociados a los casos de uso: Consulta
     // ---------------------------------------------------
     
-	/**
-	 * m�todo que retorna los videos en orden alfab�tico.
-	 * invoca al DAO para obtener los resultados.
-	 * @return ArrayList lista con los videos ordenados alfabeticamente.
-	 * @throws Exception pasa la excepci�n generada por el DAO
-	 */
-	public ArrayList<VideosValue> darVideosDefault() throws Exception
-	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-	    return dao.darVideosDefault();
-	}	
 	
 	/**
 	 * Da los tipos de producto que existen</br>
@@ -165,6 +154,12 @@ public class CabAndes
 		return dao.darListaSimple("usuarios");
 	}
 	
+	public ArrayList<String> darIdsPedidosEfectivos() throws Exception
+	{
+		ConsultaDAO dao = new ConsultaDAO(ruta);
+		return dao.darListaSimple("pedidosEfectivos");
+	}
+	
 	public ArrayList<ProductosValue> darResultadoBusquedaProductos(String parametros) throws Exception
 	{
 		DAOProducto dao = new DAOProducto(ruta);
@@ -186,6 +181,14 @@ public class CabAndes
 			respuesta.add(listaInicial.get(i).toArrayList());
 		return respuesta;
 	}
+	
+	public ArrayList<ArrayList<String>> darInformacionBodegas()
+	{
+		DAOAlmacen dao = new DAOAlmacen(ruta);
+		return dao.darInformacionBodegas();
+	}
+	
+	
 
 	
 	
@@ -273,7 +276,11 @@ public class CabAndes
 		 // Req 2.2-2.4 Iter 2
 		
 		 
+<<<<<<< HEAD
 		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp )
+=======
+		 public boolean enviarPedidoAlLocal( String idPedidoLocal, ArrayList<ItemInventarioValue> itemsQueSatisfacen )
+>>>>>>> branch 'master' of https://github.com/camiloforero/SisTrans.git
 		 {
 			 return false;
 		 }
@@ -310,7 +317,13 @@ public class CabAndes
 			
 		}
 		 
-		 
+		public static void main (String args[])
+		{
+			CabAndes cab = CabAndes.darInstancia();
+			ConsultaDAO dao = new ConsultaDAO("C:\\Users\\Camilo\\git\\SisTrans\\CentralAbastos\\WebContent");
+			dao.commit();
+			
+		}
 		 
 		 
 	 

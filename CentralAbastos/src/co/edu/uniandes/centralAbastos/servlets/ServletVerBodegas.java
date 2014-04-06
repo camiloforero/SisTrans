@@ -5,6 +5,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import co.edu.uniandes.centralAbastos.vistas.Vista;
+import co.edu.uniandes.centralAbastos.vistas.VistaTablaSimple;
+
 public class ServletVerBodegas extends ServletTemplate
 {
 
@@ -28,6 +31,7 @@ public class ServletVerBodegas extends ServletTemplate
 	@Override
 	public void escribirContenido(HttpServletRequest request, HttpServletResponse response) throws IOException 
 	{
+		Vista vista = new VistaTablaSimple();
 		
 		
 		

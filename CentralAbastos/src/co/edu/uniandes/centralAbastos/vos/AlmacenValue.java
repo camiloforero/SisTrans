@@ -51,7 +51,23 @@ public class AlmacenValue
 
 		public static ArrayList<String> darHeaders() 
 		{
-			ArrayList<String> respuesta = new ArrayList();
+			ArrayList<String> respuesta = new ArrayList<String>();
+			respuesta.add("Código");
+			respuesta.add("Capacidad");
+			respuesta.add("Carga");
+			respuesta.add("Tipo de producto");
+			respuesta.add("Estado");
+			return respuesta;
+		}
+		
+		public ArrayList<String> toArrayList()
+		{
+			ArrayList<String> respuesta = new ArrayList<String>();
+			respuesta.add(codigo);
+			respuesta.add(capacidad+"");
+			respuesta.add(cantidadKg+"");
+			respuesta.add(tipoProducto);
+			respuesta.add(estado);
 			return respuesta;
 		}
 		
