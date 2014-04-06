@@ -350,7 +350,7 @@ public class DAOAlmacen extends ConsultaDAO
 	
 	}
 
-	public ArrayList<AlmacenValue> darInformacionBodegas() 
+	public ArrayList<AlmacenValue> darInformacionBodegas() throws Exception
 	{
 		PreparedStatement prepStmt = null;
 		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();

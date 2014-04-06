@@ -182,7 +182,7 @@ public class CabAndes
 		return respuesta;
 	}
 	
-	public ArrayList<ArrayList<String>> darInformacionBodegas()
+	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
 		return dao.darInformacionBodegas();
