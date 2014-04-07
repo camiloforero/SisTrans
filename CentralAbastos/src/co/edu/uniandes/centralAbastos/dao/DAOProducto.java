@@ -96,7 +96,7 @@ public class DAOProducto extends ConsultaDAO
 				throw e;
 			}finally 
 			{
-				cerrarConexion(prepStmt);
+				cerrarStatement(prepStmt);
 			}		
 			return productos;
 	    }

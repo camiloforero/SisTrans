@@ -45,7 +45,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
 		
 	}
@@ -70,7 +70,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
 		
 	}
@@ -99,7 +99,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		
 		return resp;

@@ -94,7 +94,7 @@ public class DAOPedidosOferta extends ConsultaDAO
 			e.printStackTrace();
 		}
     	finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
     	
     	return a;
@@ -141,7 +141,7 @@ public class DAOPedidosOferta extends ConsultaDAO
 			e.printStackTrace();
 		}
 		finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
 		
 		return a ;

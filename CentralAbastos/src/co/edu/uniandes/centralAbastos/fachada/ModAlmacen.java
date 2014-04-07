@@ -307,6 +307,7 @@ public class ModAlmacen
 		else 
 			return false;
 	}
+	
 	public void abrirBodega(String codigo) throws Exception
 	{
 		dao.abrirBodega(codigo);

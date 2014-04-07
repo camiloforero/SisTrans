@@ -312,6 +312,7 @@ public class CabAndes
 
 		 {
 			 // Sacar el id del local.
+			 
 			 String idLocal = modLocal.darCodigoLocalSegunPedido(idPedidoLocal);
 			 
 			 // descontarlas de la bodega.

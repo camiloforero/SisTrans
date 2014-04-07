@@ -19,6 +19,11 @@ public class DAOAlmacen extends ConsultaDAO
 	
 
 	
+	public DAOAlmacen(String ruta) 
+	{
+		super(ruta);
+		// TODO Auto-generated constructor stub
+	}
 	/**
 	 * 
 	 */
@@ -36,10 +41,7 @@ public class DAOAlmacen extends ConsultaDAO
 	private static final String CERRAR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'CERRADA' WHERE COD_ALMACEN = '";
 	private static final String ABRIR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'ABIERTA' WHERE COD_ALMACEN = '";
 	
-	public DAOAlmacen(String ruta) {
-		super(ruta);
-		
-	}
+	
 	
 	/**
 	 * Busca una bodega especifica de la base de datos.
@@ -113,7 +115,7 @@ public class DAOAlmacen extends ConsultaDAO
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	
 		return a;
@@ -130,7 +132,7 @@ public class DAOAlmacen extends ConsultaDAO
 			
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	}
 	
@@ -220,7 +222,7 @@ public class DAOAlmacen extends ConsultaDAO
 			e.printStackTrace();
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		return true;
 		//TODO: Este método no está revisando si la bodega en cuestión ya existe o no, ni está rebalanceando
@@ -246,7 +248,7 @@ public class DAOAlmacen extends ConsultaDAO
 			e.printStackTrace();
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		return true;
 		//TODO: Este método no está rebalanceando
@@ -273,7 +275,7 @@ public class DAOAlmacen extends ConsultaDAO
 			throw e;
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
 		//los productos para que salgan de acá.
@@ -296,7 +298,7 @@ public class DAOAlmacen extends ConsultaDAO
 			e.printStackTrace();
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
 		//los productos para que vuelvan a entrar acá.
@@ -446,7 +448,7 @@ public class DAOAlmacen extends ConsultaDAO
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	
 		return a;
