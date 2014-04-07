@@ -54,6 +54,7 @@ public class ModAlmacen
 				dao.insertarEnInventario(pedidoEntrante.getProducto(), pedidoEntrante.getTipoProducto(), bod.getCodigo(), Wcaja, num_cajas, pedidoEntrante.getFechaExpiracion());
 				return true;
 			}
+			dao.commit();
 		}
 		
 		// parte el pedido y lo almacena en distintas bodegas donde vaya encontrando espacio 

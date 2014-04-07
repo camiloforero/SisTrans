@@ -50,6 +50,9 @@ public class ModLocal
 			ItemInventarioValue itemARempacar = null;
 			double X_porDespachar = pesoVendido;
 			double X_restanteEnCaja = 0.0;
+			
+			
+			
 			for (ItemInventarioValue item : itemsLocal) 
 			{
 				double pesoDespachado = item.getCantidad()*item.getPresentacion();
@@ -59,7 +62,7 @@ public class ModLocal
 					descontarExistenciasDeLocal(nombreProducto, tipoProd , item.getPresentacion(), item.getCantidad(), item.getFechaExp(), idLocal); // saco todo de las cajas
 					X_porDespachar = r;
 				}
-				else if( r <= 0 )
+				else if( r <= 0.0 )
 				{
 					pesoDespachado = X_porDespachar;
 					X_restanteEnCaja = -r ;
@@ -85,15 +88,7 @@ public class ModLocal
 	{
 		ArrayList<String> idCajas = daoAlm.darIDPresentaciones(tipoProducto);
 		ArrayList<Integer> combMinCajas = daoAlm.darCombinacionDeMinimoNumeroCajas(tipoProducto, kgAReempacar, idCajas); // ej: < 1 , 3 , 1 > con cajas:< 1 kg, 2 kg, 5 kg>
-		for(int i = 0 ; i < idCajas.size() ; i++)
-		{
-			double wcajas = 0.0;
-			if(idCajas.get(i).equals("c05"))
-				idCajas.get(i).replaceAll("c05", "c0.5");
-			wcajas = Double.parseDouble( idCajas.get(i).substring(1) ) ;
-			int cantidad = combMinCajas.get(i);
-			this.adicionarExistenciasEnItemInventario(itemModificado.getCod_almacen(), itemModificado.getNomb_producto(), wcajas, itemModificado.getFechaExp(), cantidad);
-		}
+		
 	}
 	
 	

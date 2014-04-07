@@ -473,21 +473,16 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @return
 	 * @throws SQLException
 	 */
-	public ArrayList<String>  darIDPresentaciones(String TipoProducto) throws SQLException
+	public ArrayList<Double>  darPresentaciones(String TipoProducto) throws SQLException
 	{
-		ArrayList<String> s = new ArrayList<String>();
+		ArrayList<Double> s = new ArrayList<Double>();
 		PreparedStatement prepStmt = null;
 		try {
 			ResultSet rs = super.hacerQuery("select peso_presentacion from se_vende_en where tipo_producto = '"+TipoProducto+"'", prepStmt);
 			
 			while(rs.next())
 			{
-				String value = rs.getString(0);
-				if( value.equals("0,5") )
-					s.add("c05");
-				else
-					s.add(  "c"+value );
-				
+				s.add( rs.getDouble(1) );
 			}
 			
 		
@@ -504,47 +499,9 @@ public class DAOAlmacen extends ConsultaDAO
 	 */
 	public ArrayList<Integer> darCombinacionDeMinimoNumeroCajas(String tipoProducto, double kgAReempacar, ArrayList<String> idCols ) throws SQLException
 	{
+		if(conexion.getTransactionIsolation() == conexion.TRANSACTION_SERIALIZABLE);
 		
-		String fromPart = "";
-		String sumaCajas = "";
-		String sumaPesos = "";
-		for (int i = 0; i < idCols.size() ; i++) {
-			
-			if ( i < idCols.size() -1 ){
-				fromPart+= " (select "+idCols.get(i)+" from test) cross join ";
-				sumaCajas+= " " +idCols.get(i)+ "+ "  ;
-				if( idCols.get(i).equals("c05") )
-					sumaPesos+= " " +idCols.get(i)+ "*0.5 + " ;
-				else
-					sumaPesos+= " " +idCols.get(i)+ "*"+idCols.get(i).substring(1)+"+ " ;
-			}
-			else{ 
-				fromPart+= "(select "+idCols.get(i)+" from test) ";
-				sumaCajas+=  " "+idCols.get(i)+" ";
-				if( idCols.get(i).equals("c05") )
-					sumaPesos+= " " +idCols.get(i)+ "*0.5  " ;
-				else
-					sumaPesos+= " " +idCols.get(i)+ "*"+idCols.get(i).substring(1)+" " ;
-			}
-			
-		}
-		
-		String q="select *  from "+fromPart+"  where "+sumaPesos+"="+kgAReempacar+" and "+sumaCajas+" <= all(select  "+sumaCajas+"  from "+fromPart+" where ("+sumaPesos+")= "+kgAReempacar+") " ;
-		System.out.println("Checkeo de la query_: "+q);
-		
-		ArrayList<Integer> respuesta = new ArrayList<Integer>();
-		PreparedStatement prepStatement = null;
-		ResultSet rs = super.hacerQuery(q, prepStatement);
-		if(rs.next())
-		{
-			for(int i = 0 ; i < idCols.size() ; i++)
-			{
-				respuesta.add( rs.getInt( idCols.get(i) ) );
-			}
-		}
-				
-		return respuesta;	
-	
+		System.out.println( ;
 	}
 	
 	

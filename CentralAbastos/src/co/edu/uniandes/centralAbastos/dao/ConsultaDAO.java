@@ -452,6 +452,8 @@ public class ConsultaDAO {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	   
+	   conexion.
    }
    
    
