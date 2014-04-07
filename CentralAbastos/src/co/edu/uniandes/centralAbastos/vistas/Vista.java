@@ -61,7 +61,9 @@ public abstract class Vista
 	}
 	
 	/**
-	 * Imprime la vista, asignandole un template </br>
+	 * Imprime la vista, asignandole un template. </br>
+	 * template = engine.getTemplate("nombreTemplate.vm"); </br>
+	 * merge(respuesta); </br>
 	 * <b>pre: <b>Todas las collections necesarias para generar la página están dentro del contexto, y se ha seleccionado un template </br>
 	 * <b>post: <b> La página web se ha escrito en el PrintWriter del servlet
 	 * @param respuesta: PrintWriter del servlet donde se escribe el contenido HTML

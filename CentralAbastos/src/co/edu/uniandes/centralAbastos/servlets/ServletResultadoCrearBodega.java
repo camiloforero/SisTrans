@@ -39,13 +39,17 @@ public class ServletResultadoCrearBodega extends ServletTemplate
 		System.out.println(request.getParameter("tipo"));
 		
 		try {
-			CabAndes.darInstancia().agregarBodega(codigo, capacidad, tipoProducto);
+			boolean resultado = CabAndes.darInstancia().agregarBodega(codigo, capacidad, tipoProducto);
+			if(resultado)
+				imprimirMensajeOk(respuesta, "Success!", "La bodega ha sido creada satisfactoriamente");
+			else
+				imprimirMensajeError(respuesta, "Falla", "Hubo un error a la hora de crear la bodega");
+			
 		} catch (Exception e) 
 		{
 			this.imprimirMensajeError(respuesta, "Error", "Hubo una excepción", e);
 			e.printStackTrace();
 		}
-		imprimirMensajeOk(respuesta, "Success!", "La bodega ha sido creada satisfactoriamente");
 		
 		// TODO Auto-generated method stub
 		

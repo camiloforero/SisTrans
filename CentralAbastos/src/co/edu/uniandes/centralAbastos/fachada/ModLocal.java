@@ -40,6 +40,8 @@ public class ModLocal
 	 */
 	public boolean venderProducto( String nombreProducto, String idLocal , double pesoVendido ) throws Exception
 	{
+		// primeoro meterla en enteraa en una caja 
+		
 		// buscar en la bodegaDelAlmacen y asegurarme que hay peso suficiente. 
 		AlmacenValue local = daoAlm.darLocal(idLocal);
 		String tipoProd = daoAlm.darTipoProducto(nombreProducto);

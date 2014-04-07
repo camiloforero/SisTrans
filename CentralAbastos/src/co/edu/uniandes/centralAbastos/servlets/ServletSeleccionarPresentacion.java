@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import co.edu.uniandes.centralAbastos.fachada.CabAndes;
 import co.edu.uniandes.centralAbastos.vistas.Vista;
 import co.edu.uniandes.centralAbastos.vistas.VistaListaSimple;
+import co.edu.uniandes.centralAbastos.vistas.VistaSeleccionarPresentacion;
 
 public class ServletSeleccionarPresentacion extends ServletTemplate
 {
@@ -36,13 +37,14 @@ public class ServletSeleccionarPresentacion extends ServletTemplate
 	public void escribirContenido(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
 		PrintWriter respuesta = response.getWriter();
-		Vista vista = new VistaListaSimple();
+		Vista vista = new VistaSeleccionarPresentacion();
 		CabAndes instancia = CabAndes.darInstancia();
-		ArrayList<String> accion = new ArrayList<String>();
-		accion.add("listaPresentaciones.htm");
-		vista.put("accion", accion);
+		//ArrayList<String> producto = new ArrayList<String>();
+		//accion.add("resultadoRegistrarPedido.htm");
+		vista.put("producto", request.getParameter("valor"));
+		System.out.println(request.getParameter("valor"));
 		try {
-			vista.put("listaOpciones", instancia.darNombresProductos());
+			vista.put("listaOpciones", instancia.darPresentaciones());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

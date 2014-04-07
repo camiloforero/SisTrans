@@ -45,7 +45,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
 		
 	}
@@ -57,12 +57,12 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	public void registrarFechaLlegada(String idPedidoEfectivo) throws Exception
 	{
 		Date today = new Date();
-		DateFormat df = new SimpleDateFormat("dd/mm/yy");
+		DateFormat df = new SimpleDateFormat("dd-MMM-yy");
 		
 		PreparedStatement prepStmt = null;
 		try {
 			
-			super.ejecutarTask( " UPDATE PEDIDO_EFECTIVO SET FECHA_LLEGADA=' "+df.format(today)+" ' WHERE ID_PEDIDO = ' "+idPedidoEfectivo+" '"
+			super.ejecutarTask( " UPDATE PEDIDO_EFECTIVO SET FECHA_LLEGADA='"+df.format(today)+"' WHERE ID_PEDIDO = '"+idPedidoEfectivo+"'"
 					, prepStmt);
 			
 			
@@ -70,14 +70,14 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-    		super.cerrarConexion(prepStmt);
+    		super.cerrarStatement(prepStmt);
     	}
 		
 	}
 
 	/**
 	 * 
-	 * @return pedido efectivo segun id
+	 * @return pedido efectivo segun id. Incluye el nombre del producto, su tipo, la cantidad, el peso de cada caja, la fecha de vencimiento y el precio por kilogramo
 	 * @throws Exception 
 	 */
 	public PedidoEfectivoValue darPedidoEfectivo(String idPedido) throws Exception
@@ -90,8 +90,8 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			
 			while(rs.next())
 			{
+				//COnsigue el nombre del producto, el tipo del producto, 
 				resp = new PedidoEfectivoValue( rs.getString(1), rs.getString(2), rs.getInt(3), rs.getDouble(4) , rs.getString(5), rs.getDouble(6) );
-				System.out.println(resp);
 			}
 			
 			
@@ -99,7 +99,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		
 		return resp;
@@ -143,7 +143,7 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	public void updateValoresProveedor(String correoProveedor,int calificacion) throws SQLException
 	{
 		PreparedStatement prepStmt = null;
-		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1" , prepStmt);
+		super.ejecutarTask("UPDATE PROVEEDORES SET CALIFICACION="+calificacion+", NUM_ENTREGAS=NUM_ENTREGAS+1 WHERE CORREO_USUARIO = '"+correoProveedor+"'" , prepStmt);
 	}
 	
 	

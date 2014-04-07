@@ -30,10 +30,23 @@
   <servlet-name>ServletMenuUsuario</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletMenuUsuario</servlet-class>
  </servlet>
+ 
  <servlet>
   <display-name>ServletRegistrarPedido</display-name>
   <servlet-name>ServletRegistrarPedido</servlet-name>
   <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletRegistrarPedido</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletSeleccionarPresentacion</display-name>
+  <servlet-name>ServletSeleccionarPresentacion</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletSeleccionarPresentacion</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <display-name>ServletResultadoRegistrarPedido</display-name>
+  <servlet-name>ServletResultadoRegistrarPedido</servlet-name>
+  <servlet-class>co.edu.uniandes.centralAbastos.servlets.ServletResultadoRegistrarPedido</servlet-class>
  </servlet>
  
  <servlet>
@@ -143,10 +156,22 @@
   <servlet-name>ServletMenuUsuario</servlet-name>
   <url-pattern>/menuUsuario.htm</url-pattern>
  </servlet-mapping>
+ 
  <servlet-mapping>
   <servlet-name>ServletRegistrarPedido</servlet-name>
   <url-pattern>/registrarPedido.htm</url-pattern>
  </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletSeleccionarPresentacion</servlet-name>
+  <url-pattern>/listaPresentaciones.htm</url-pattern>
+ </servlet-mapping>
+ 
+ <servlet-mapping>
+  <servlet-name>ServletResultadoRegistrarPedido</servlet-name>
+  <url-pattern>/resultadoRegistrarPedido.htm</url-pattern>
+ </servlet-mapping>
+ 
  <servlet-mapping>
   <servlet-name>ServletSeleccionarPedidoOferta</servlet-name>
   <url-pattern>/seleccionarPedidoOferta.htm</url-pattern>

@@ -26,6 +26,7 @@ import java.util.Properties;
 
 
 
+
 import co.edu.uniandes.centralAbastos.vos.VideosValue;
 
 /**
@@ -100,7 +101,7 @@ public class ConsultaDAO {
 													+ "FROM USUARIOS u LEFT JOIN COMPRADORES c ON u.CORREO = c.CORREO_USUARIO LEFT JOIN ADMIN_LOCAL a ON u.CORREO = a.CORREO_USUARIO LEFT JOIN PROVEEDORES p ON u.CORREO = p.CORREO_USUARIO";
 	
 	
-	private static final String listaPedidosEfectivos = "SELECT ID_PEDIDO FROM PEDIDOS_EFECTIVOS WHERE FECHA_LLEGADA IS NULL";
+	private static final String listaPedidosEfectivos = "SELECT ID_PEDIDO FROM PEDIDO_EFECTIVO WHERE FECHA_LLEGADA IS NULL";
 	
 	
 
@@ -113,33 +114,33 @@ public class ConsultaDAO {
 	/**
 	 * conexion con la base de datos
 	 */
-	public Connection conexion;
+	private static Connection conexion;
 	
 	/**
 	 * nombre del usuario para conectarse a la base de datos.
 	 */
-	private String usuario;
+	private static String usuario;
 	
 	/**
 	 * clave de conexión a la base de datos.
 	 */
-	private String clave;
+	private static String clave;
 	
 	/**
 	 * URL al cual se debe conectar para acceder a la base de datos.
 	 */
-	private String cadenaConexion;
+	private static String cadenaConexion;
 	
 	/**
 	 * constructor de la clase. No inicializa ningun atributo.
 	 */
 	public ConsultaDAO(String ruta) 
-	{		
-		inicializar(ruta);
+	{	if(cadenaConexion == null)
+			inicializar(ruta);
 	}
 	
 	// -------------------------------------------------
-    // M�todos
+    // Métodos
     // -------------------------------------------------
 
 	/**
@@ -164,6 +165,7 @@ public class ConsultaDAO {
 			clave = prop.getProperty("clave");	// "c2501XX";
 			final String driver = prop.getProperty("driver");
 			Class.forName(driver);
+			System.out.println("Se está ejecutando una conexión");
 		
 		}
 		catch(Exception e)
@@ -180,17 +182,27 @@ public class ConsultaDAO {
 	 * @param clave clave de acceso a la base de datos
 	 * @throws SQLException si ocurre un error generando la conexi�n con la base de datos.
 	 */
-    private void establecerConexion(String url, String usuario, String clave) throws SQLException
+    public void establecerConexion() throws SQLException
     {
     	try
         {
-			conexion = DriverManager.getConnection(url,usuario,clave);
+    		conexion = DriverManager.getConnection(cadenaConexion, usuario, clave);
+    		PrintStackTraceEstablecerConexion();
+			
         }
         catch( SQLException exception )
         {
         	exception.printStackTrace();
             throw new SQLException( "ERROR: ConsultaDAO obteniendo una conexion." );
-        }
+        } catch (Exception e) 
+        {
+			e.printStackTrace();
+		}
+    }
+    
+    private void PrintStackTraceEstablecerConexion() throws Exception
+    {
+    	throw new Exception("StackConexiónEstablecida");
     }
     
     /**
@@ -198,13 +210,13 @@ public class ConsultaDAO {
      * @param con objeto de conexi�n a la base de datos
      * @throws SistemaCinesException Si se presentan errores de conexi�n
      */
-    public void closeConnection(Connection connection) throws Exception 
+    public void closeConnection() throws Exception 
     {        
-    	
+    	System.out.println("conexión cerrada");
 		try 
 		{
-			connection.close();
-			connection = null;
+			conexion.close();
+			conexion = null;
 			
 		} catch (SQLException exception) {
 			throw new Exception("Error a la hora de cerrar una conexión");
@@ -219,8 +231,7 @@ public class ConsultaDAO {
     
     public ResultSet hacerQuery(String statement, PreparedStatement prepStmt) throws SQLException
     {
-    	establecerConexion(cadenaConexion, usuario, clave);
-		prepStmt = conexion.prepareStatement(statement);		
+    	prepStmt = conexion.prepareStatement(statement);		
 		return prepStmt.executeQuery();
     }
     
@@ -233,19 +244,19 @@ public class ConsultaDAO {
     public int ejecutarTask(String statement, PreparedStatement prepStmt) throws SQLException
     {
     	
-    	establecerConexion(cadenaConexion, usuario, clave);
-		prepStmt = conexion.prepareStatement(statement);
+    	prepStmt = conexion.prepareStatement(statement);
 		return prepStmt.executeUpdate();
     }
     
-    public void cerrarConexion(PreparedStatement prepStmt) throws Exception
+    public void cerrarStatement(PreparedStatement prepStmt) throws SQLException
     {
     	if (prepStmt != null) 
 		{
 			prepStmt.close();
 		}
-		closeConnection(conexion);
+		
     }
+    
     
     /**
      * Método que se encarga de realizar la consulta en la base de datos
@@ -285,7 +296,7 @@ public class ConsultaDAO {
 			throw new Exception("ERROR = ConsultaDAO: loadRowsBy(..) Agregando parametros y executando el statement!!!");
 		}finally 
 		{
-			cerrarConexion(prepStmt);
+			cerrarStatement(prepStmt);
 		}		
 		return videos;
     }
@@ -378,7 +389,7 @@ public class ConsultaDAO {
 			throw new Exception("ERROR = ConsultaDAO: loadRowsBy(..) Agregando parametros y executando el statement!!!");
 		}finally 
 		{
-			cerrarConexion(prepStmt);
+			cerrarStatement(prepStmt);
 		}		
 		return ans;
     }
@@ -417,7 +428,7 @@ public class ConsultaDAO {
 			throw new Exception("ERROR = ConsultaDAO: loadRowsBy(..) Agregando parametros y executando el statement!!!");
 		}finally 
 		{
-			cerrarConexion(prepStmt);
+			cerrarStatement(prepStmt);
 		}		
 		return respuesta;
 	}

@@ -1,13 +1,12 @@
 package co.edu.uniandes.centralAbastos.dao;
 
-import java.nio.charset.CodingErrorAction;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.RowId;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import oracle.jdbc.proxy.annotation.Pre;
+
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 
@@ -16,6 +15,11 @@ public class DAOAlmacen extends ConsultaDAO
 	
 
 	
+	public DAOAlmacen(String ruta) 
+	{
+		super(ruta);
+		// TODO Auto-generated constructor stub
+	}
 	/**
 	 * 
 	 */
@@ -33,10 +37,7 @@ public class DAOAlmacen extends ConsultaDAO
 	private static final String CERRAR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'CERRADA' WHERE COD_ALMACEN = '";
 	private static final String ABRIR_BODEGA = "UPDATE BODEGAS SET ESTADO = 'ABIERTA' WHERE COD_ALMACEN = '";
 	
-	public DAOAlmacen(String ruta) {
-		super(ruta);
-		
-	}
+	
 	
 	/**
 	 * Busca una bodega especifica de la base de datos.
@@ -48,7 +49,7 @@ public class DAOAlmacen extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		try {
 			
-			ResultSet rs = super.hacerQuery(ALL_BODEGAS+" where A.CODIGO=' "+codigo+"' ", prepStmt);
+			ResultSet rs = super.hacerQuery(ALL_BODEGAS+" where A.CODIGO='"+codigo+"' ", prepStmt);
 			if(rs.next()){
 		
 				return new AlmacenValue(rs.getString(1), rs.getDouble(2), rs.getDouble(3), rs.getString(4));
@@ -93,12 +94,14 @@ public class DAOAlmacen extends ConsultaDAO
 	 */
 	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd, String codBodegaExc ) throws Exception
 	{
+		if(codBodegaExc == null || codBodegaExc == "") codBodegaExc = " ";
 		PreparedStatement prepStmt = null;
 		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
 		
 		try {
 		
 			ResultSet rs = super.hacerQuery( ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " , prepStmt);
+			System.out.println(ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " );
 			
 			while(rs.next()){
 				
@@ -108,7 +111,7 @@ public class DAOAlmacen extends ConsultaDAO
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	
 		return a;
@@ -118,14 +121,14 @@ public class DAOAlmacen extends ConsultaDAO
 	{
 		PreparedStatement prepStmt = null;
 		try {
-			
-			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO=CANTIDAD_PRODUCTO"+cantidadProducto+" where codigo ="+codAlmacen+"", prepStmt);
+			System.out.println("UPDATE ALMACEN SET CANTIDAD_PRODUCTO=CANTIDAD_PRODUCTO +"+cantidadProducto+" WHERE codigo ="+codAlmacen+"");
+			super.ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO=CANTIDAD_PRODUCTO +"+cantidadProducto+" WHERE codigo ="+codAlmacen+"", prepStmt);
 			
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	}
 	
@@ -138,19 +141,50 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @param fechaExpiracion
 	 * @return true si lo pudo almacenar o false dlc.
 	 */
-	public boolean insertarEnInventario(String nomb_producto, String tipoProd, String cod_almacen,double peso_caja,int cantidad,String fechaExpiracion)
+	public boolean insertarEnInventario(String nomb_producto, String tipoProd, String cod_almacen,double peso_caja,int cantidad,String fechaExpiracion) throws Exception
 	{
 		PreparedStatement prepStmt = null;
+		System.out.println("entra a insertar en inventario");
 		
 		try {
 			ResultSet rs = super.hacerQuery("Select * from almacen a where a.codigo = ' "+cod_almacen+" '  and a.TIPO_PRODUCTO = ' "+tipoProd +" ' ", prepStmt);
-			if( ! rs.next() ) {
-				super.ejecutarTask( "INSERT INTO ITEM_INVENTARIO VALUES("+nomb_producto+","+cod_almacen+","+peso_caja+","+cantidad+","+fechaExpiracion+")"  
-					, prepStmt);
+			if( ! rs.next() ) 
+			{
+				 SimpleDateFormat df1 = new SimpleDateFormat("dd-MMM-yy");
+				 SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+				System.out.println("INSERT INTO ITEM_INVENTARIO VALUES('"+nomb_producto+"','"+cod_almacen+"',"+peso_caja+","+cantidad+",'"+fechaExpiracion+"')");
+
+				 fechaExpiracion = df1.format(df2.parse(fechaExpiracion));
+					
+				System.out.println("INSERT INTO ITEM_INVENTARIO VALUES('"+nomb_producto+"','"+cod_almacen+"',"+peso_caja+","+cantidad+",'"+fechaExpiracion+"')");
+				try{
+					super.ejecutarTask( "INSERT INTO ITEM_INVENTARIO VALUES('"+nomb_producto+"','"+cod_almacen+"',"+peso_caja+","+cantidad+",'"+fechaExpiracion+"')"  
+							, prepStmt);
+				}
+				catch(SQLException e)
+				{
+					System.out.println("Cödigo de error: " + e.getErrorCode());
+					System.out.println("Causa: " + e.getMessage());
+					if(e.getErrorCode() == 1)
+					{
+						System.out.println("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + peso_caja*cantidad + " WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'");
+
+						super.ejecutarTask("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + cantidad + " WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'"  
+								, prepStmt);
+					}
+					
+				}
+				
 				return true;
 			}
 			
-		} catch (SQLException e) {
+		} catch (SQLException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		}
+		catch (java.text.ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -181,10 +215,12 @@ public class DAOAlmacen extends ConsultaDAO
 		{
 			System.out.println(AGREGAR_ALMACEN + query1);
 			System.out.println(AGREGAR_BODEGA + query2);
+			System.out.println(e.getErrorCode() + "error code");
 			e.printStackTrace();
+			return false;
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		return true;
 		//TODO: Este método no está revisando si la bodega en cuestión ya existe o no, ni está rebalanceando
@@ -210,7 +246,7 @@ public class DAOAlmacen extends ConsultaDAO
 			e.printStackTrace();
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		return true;
 		//TODO: Este método no está rebalanceando
@@ -225,6 +261,8 @@ public class DAOAlmacen extends ConsultaDAO
 			
 			super.ejecutarTask(CERRAR_BODEGA + codigo + "'", prepStmt);
 			System.out.println(CERRAR_BODEGA + codigo + "'");
+			ejecutarTask("DELETE FROM ITEM_INVENTARIO WHERE COD_ALMACEN = '"+codigo+"'", prepStmt);
+			ejecutarTask("UPDATE ALMACEN SET CANTIDAD_PRODUCTO = 0 WHERE CODIGO = '"+codigo+"'", prepStmt);
 			
 			
 		} 
@@ -232,9 +270,10 @@ public class DAOAlmacen extends ConsultaDAO
 		{
 			System.out.println(CERRAR_BODEGA + codigo + "'");
 			e.printStackTrace();
+			throw e;
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
 		//los productos para que salgan de acá.
@@ -257,7 +296,7 @@ public class DAOAlmacen extends ConsultaDAO
 			e.printStackTrace();
 		}finally
 		{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 		//TODO: Este método no está rebalanceando
 		//los productos para que vuelvan a entrar acá.
@@ -277,7 +316,7 @@ public class DAOAlmacen extends ConsultaDAO
 		ArrayList<ItemInventarioValue> resp = new ArrayList<ItemInventarioValue>();
 		
 		try {
-			ResultSet rs = super.hacerQuery(ITEMS_INVENTARIO+" where cod_almacen=' "+codigoBodega+" ' ", prepStmt);
+			ResultSet rs = super.hacerQuery(ITEMS_INVENTARIO+" WHERE COD_ALMACEN='"+codigoBodega+"' ", prepStmt);
 			
 			while(rs.next()){
 				ItemInventarioValue item = new ItemInventarioValue(rs.getString(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),rs.getString(5));
@@ -339,12 +378,13 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @return la capacidad en todas las bodegas distintas a codBodega. 
 	 * 		para retornar la capacidad de todas llamar el metodo con codBodega como cadena vacia.
 	 */
-	public double darCapacidadTotalDisp(String codBodega)
+	public double darCapacidadTotalDisp(String codBodega, String tipoProducto)
 	{
 		PreparedStatement prepStmt = null;
 		double resp = 0;
 		try {
-			ResultSet rs = super.hacerQuery( "select sum(capacidad-cantidad_producto) from almacen a join bodegas b on a.codigo=b.cod_almacen where b.cod_almacen !='"+codBodega+"'" , prepStmt);
+			System.out.println("SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO != '" + tipoProducto + "'" );
+			ResultSet rs = super.hacerQuery( "SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO = '" + tipoProducto + "'" , prepStmt);
 			if(rs.next())
 				resp = rs.getDouble(1);
 			
@@ -407,7 +447,7 @@ public class DAOAlmacen extends ConsultaDAO
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally{
-			super.cerrarConexion(prepStmt);
+			super.cerrarStatement(prepStmt);
 		}
 	
 		return a;
