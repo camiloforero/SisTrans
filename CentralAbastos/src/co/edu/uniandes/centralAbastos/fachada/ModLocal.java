@@ -88,8 +88,7 @@ public class ModLocal
 
 	private void reempacar(ItemInventarioValue itemModificado, String tipoProducto, double kgAReempacar) throws Exception 
 	{
-		ArrayList<String> idCajas = daoAlm.darIDPresentaciones(tipoProducto);
-		ArrayList<Integer> combMinCajas = daoAlm.darCombinacionDeMinimoNumeroCajas(tipoProducto, kgAReempacar, idCajas); // ej: < 1 , 3 , 1 > con cajas:< 1 kg, 2 kg, 5 kg>
+		ArrayList<Double> idCajas = daoAlm.darPresentaciones(tipoProducto);
 		
 	}
 	

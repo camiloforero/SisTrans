@@ -464,7 +464,6 @@ public class ConsultaDAO {
 		e.printStackTrace();
 	}
 	   
-	   conexion.
    }
    
    

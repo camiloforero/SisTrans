@@ -533,16 +533,7 @@ public class DAOAlmacen extends ConsultaDAO
 		
 		return s;
 	}
-	/**
-	 * @throws SQLException 
-	 * 
-	 */
-	public ArrayList<Integer> darCombinacionDeMinimoNumeroCajas(String tipoProducto, double kgAReempacar, ArrayList<String> idCols ) throws SQLException
-	{
-		if(conexion.getTransactionIsolation() == conexion.TRANSACTION_SERIALIZABLE);
-		
-		System.out.println( ;
-	}
+	
 	
 	
 
