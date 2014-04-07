@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import co.edu.uniandes.centralAbastos.dao.ConsultaDAO;
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
 import co.edu.uniandes.centralAbastos.dao.DAOPedido;
+import co.edu.uniandes.centralAbastos.dao.DAOPedidoLocal;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos.proveedorDetallesValue;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosOferta;
@@ -44,7 +45,8 @@ public class CabAndes
 	private ModPedidoDeOferta modPedidoDeOferta;
 	
 	private ModAlmacen modAlmacen;
-
+	
+	private ModLocal modLocal;
     
     // -----------------------------------------------------------------
     // Singleton
@@ -87,6 +89,7 @@ public class CabAndes
 		this.ruta = ruta;
 		modPedidoDeOferta = new ModPedidoDeOferta(new DAOPedidosOferta(ruta));
 		modAlmacen = new ModAlmacen(new DAOAlmacen(ruta));
+		modLocal = new ModLocal(new DAOAlmacen(ruta), new DAOPedidoLocal(ruta));
 	}
 	
     // ---------------------------------------------------
@@ -188,13 +191,17 @@ public class CabAndes
 	 * @return
 	 * @throws Exception
 	 */
+
 	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
+
+
 		ArrayList<ArrayList<String>> respuesta = new ArrayList<ArrayList<String>>();
 		for(AlmacenValue av : dao.darInformacionBodegas())
 			respuesta.add(av.toArrayList());
 		return respuesta;
+
 	}
 	
 	
@@ -286,14 +293,54 @@ public class CabAndes
 			 
 	}
 		 
-		 // Req 2.2-2.4 Iter 2
+		 // Req 3.2- 3.4Iter 2
 		
-		 
 
-		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp )
+		 /**
+		  * Requerimiento 2.2
+		  * @param idPedidoLocal
+		  * @param idBodega
+		  * @param nombProducto
+		  * @param pesoCaja
+		  * @param cantidad_Cajas_Pedido
+		  * @param fechaExp
+		  * @return
+		 * @throws Exception 
+		  */
+
+		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp ) throws Exception
+
 		 {
-			 return false;
+			 // Sacar el id del local.
+			 String idLocal = modLocal.darCodigoLocalSegunPedido(idPedidoLocal);
+			 
+			 // descontarlas de la bodega.
+			 modAlmacen.descontarExistenciasDeBodega(idBodega, nombProducto, pesoCaja, fechaExp, cantidad_Cajas_Pedido);
+			 
+			 //  adicionarlas al local
+			return  modAlmacen.adicionarExistenciasEnItemInventario(idLocal, nombProducto, pesoCaja, fechaExp, cantidad_Cajas_Pedido);
 		 }
+		
+		 /* Requerimiento 3.3 : vender productos en local*/
+		 /**
+		  * 
+		  * @param nombProducto
+		  * @param idLocal
+		  * @param pesoVendido
+		  * @return
+		  */
+		 public boolean RealizarVentaEnLocal( String nombProducto, String idLocal, double  pesoVendido )
+		 {
+			 try {
+				return modLocal.venderProducto( nombProducto,idLocal, pesoVendido );
+			} 
+			 catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return false;
+		 }
+		 
 		 
 		 // Iteracion # 3
 		 /**
@@ -326,8 +373,4 @@ public class CabAndes
 			modAlmacen.abrirBodega(codigo);
 			
 		}
-		 
-		
-		
-
 }
