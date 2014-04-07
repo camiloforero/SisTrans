@@ -57,7 +57,7 @@ public class ModAlmacen
 		}
 		
 		// parte el pedido y lo almacena en distintas bodegas donde vaya encontrando espacio 
-		
+		this.almacenarEnDistintasBodegas(pedidoEntrante, bodegasDisp, num_cajas, Wcaja);
 		
 		return false;
 	}
@@ -80,7 +80,7 @@ public class ModAlmacen
     	
     	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega); 
     	boolean resp = false;
-    	if( capTotalDisp >= bodegaToMod.getCantidad_kg() ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
+    	if( (capTotalDisp-bodegaToMod.getCantidad_kg()) >= bodegaToMod.getCantidad_kg() ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
     	{
     		// Se almacena el pedido. 
     		for (ItemInventarioValue iiv : existenciasBodega) {
@@ -100,6 +100,7 @@ public class ModAlmacen
 		     */
 		    private boolean almacenarItemEnOtrasBodegasDesdeUnaBodega(ItemInventarioValue item , String tipoProductoBodega) throws Exception
 		    {
+		    	
 				int num_cajas = item.getCantidad();
 				double Wcajas = item.getPresentacion();
 				
@@ -231,12 +232,37 @@ public class ModAlmacen
 		     * @param pesoCaja
 		     * @param cajasSolicitadas
 		     * @return
+		     * @throws Exception 
 		     */
-		    public void descontarExistenciasDeBodega(String idBodega, String producto, double pesoCaja, String fechaExpProducto, int cajasSolicitadas )
+		    public void descontarExistenciasDeBodega(String idBodega, String producto, double pesoCaja, String fechaExpProducto, int cajasSolicitadas ) throws Exception
 		    {
-		    	int up = dao.updateCantidadCajas(producto, pesoCaja, -cajasSolicitadas ,idBodega,fechaExpProducto);	
+		    	dao.updateCantidadCajas(producto, pesoCaja, -cajasSolicitadas ,idBodega,fechaExpProducto);
+		    	dao.updateAlmacen(-cajasSolicitadas*pesoCaja, idBodega);
 		    }
-
+		    
+		    /**
+		     * 
+		     * @param idAlmacen - es el id del almacen donde se quieren guardar las existencias. idAlmacen es de una bodega o de un local 
+		     * @param producto
+		     * @param pesoCaja
+		     * @param fechaExpProducto
+		     * @param cajasToAdd - el numero de cajas para adicionar.
+		     * @return
+		     * @throws Exception 
+		     */
+		    public boolean adicionarExistenciasEnItemInventario(String idAlmacen, String producto, double pesoCaja, String fechaExpProducto, int cajasToAdd) throws Exception
+		    {
+		    	int up = dao.updateCantidadCajas(producto, pesoCaja, cajasToAdd, idAlmacen, fechaExpProducto);
+		    	if( up == 0 ){
+		    		return dao.insertarEnInventario(producto, dao.darTipoProducto(producto), idAlmacen, pesoCaja, cajasToAdd, fechaExpProducto);
+		    	}
+		    	
+		    	dao.updateAlmacen(cajasToAdd*pesoCaja, idAlmacen);
+		    	
+		    	return true;
+		    }
+		    
+		    
 		    
 		/**
 		 * 
@@ -266,6 +292,7 @@ public class ModAlmacen
 	{
 		// modificado para que incluya lo el movimiento de existencias
 		boolean r = this.reasignarExistencias(codigo);
+		
 		return dao.eliminarBodega(codigo) && r ;
 	}
 
@@ -273,6 +300,7 @@ public class ModAlmacen
 	{
 		// modificado para que incluya lo el movimiento de existencias
 		boolean resp = this.reasignarExistencias(codigo);
+		
 		if(resp)
 		{
 			dao.cerrarBodega(codigo);

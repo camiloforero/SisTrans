@@ -3,9 +3,11 @@ package co.edu.uniandes.centralAbastos.dao;
 import java.nio.charset.CodingErrorAction;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import oracle.jdbc.proxy.annotation.Pre;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 
@@ -47,6 +49,30 @@ public class DAOAlmacen extends ConsultaDAO
 		try {
 			
 			ResultSet rs = super.hacerQuery(ALL_BODEGAS+" where A.CODIGO=' "+codigo+"' ", prepStmt);
+			if(rs.next()){
+		
+				return new AlmacenValue(rs.getString(1), rs.getDouble(2), rs.getDouble(3), rs.getString(4));
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param idLocal
+	 * @return
+	 */
+	public AlmacenValue darLocal(String idLocal)
+	{
+		PreparedStatement prepStmt = null;
+		try {
+			
+			ResultSet rs = super.hacerQuery("Select * from almacen A where A.CODIGO=' "+idLocal+"' ", prepStmt);
 			if(rs.next()){
 		
 				return new AlmacenValue(rs.getString(1), rs.getDouble(2), rs.getDouble(3), rs.getString(4));
@@ -241,7 +267,7 @@ public class DAOAlmacen extends ConsultaDAO
 	// Iter 3 
 	
 	/**
-	 * Reporta los item inventario de una bodega especifica. 
+	 * Reporta los item inventario de una bodega especifica.  PILAS QUE TAMBIEN DA LAS EXISTENCIAS DE UN LOCAL.
 	 * @param codigoBodega es el de la bodega.
 	 * @return La lista si se encontro la bodega, o vacia dlc.
 	 */
@@ -291,7 +317,7 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @return El numero de columnas que modifico. 
 	 * 
 	 */
-	public int updateCantidadCajas(String nomb_producto, double wcajas, int cantidad_cajas, String codigoNuevaBodega, String fechaExp)
+	public int updateCantidadCajas(String nomb_producto, double wcajas, int cantidad_cajas, String codigoNuevaBodega, String fechaExp) throws Exception
 	{
 		PreparedStatement prepStmt = null;
 		
@@ -301,11 +327,11 @@ public class DAOAlmacen extends ConsultaDAO
 					+ " and cod_almacen = '"+codigoNuevaBodega+" '  and fecha_expiracion='"+fechaExp+"'" , prepStmt);
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			throw e;
 		}
 		
-		return 0;
+		
 	}
 	
 	/**
@@ -408,9 +434,125 @@ public class DAOAlmacen extends ConsultaDAO
 		
 		return "";
 	}
-	/////////////////////////////////// Consultas al ip
+	
+	
+	
+	/////////////////////////////////// Consultas del local ///////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * 
+	 * @param correo
+	 * @return
+	 */
+	public String darCodigoDelLocal(String correoAdmin)
+	{
+		String qq = 
+				" Select cod_almacen from admin_local where correo_usuario='"+correoAdmin+"'";
+		PreparedStatement ps = null;
+		try{
+			ResultSet rs = super.hacerQuery(qq, ps);
+			if(rs.next())
+				return rs.getString(2);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return "";
+	}
+
+	/**
+	 * Retorna las p
+	 * @param TipoProducto
+	 * @return
+	 * @throws SQLException
+	 */
+	public ArrayList<String>  darIDPresentaciones(String TipoProducto) throws SQLException
+	{
+		ArrayList<String> s = new ArrayList<String>();
+		PreparedStatement prepStmt = null;
+		try {
+			ResultSet rs = super.hacerQuery("select peso_presentacion from se_vende_en where tipo_producto = '"+TipoProducto+"'", prepStmt);
+			
+			while(rs.next())
+			{
+				String value = rs.getString(0);
+				if( value.equals("0,5") )
+					s.add("c05");
+				else
+					s.add(  "c"+value );
+				
+			}
+			
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return s;
+	}
+	/**
+	 * @throws SQLException 
+	 * 
+	 */
+	public ArrayList<Integer> darCombinacionDeMinimoNumeroCajas(String tipoProducto, double kgAReempacar, ArrayList<String> idCols ) throws SQLException
+	{
+		
+		String fromPart = "";
+		String sumaCajas = "";
+		String sumaPesos = "";
+		for (int i = 0; i < idCols.size() ; i++) {
+			
+			if ( i < idCols.size() -1 ){
+				fromPart+= " (select "+idCols.get(i)+" from test) cross join ";
+				sumaCajas+= " " +idCols.get(i)+ "+ "  ;
+				if( idCols.get(i).equals("c05") )
+					sumaPesos+= " " +idCols.get(i)+ "*0.5 + " ;
+				else
+					sumaPesos+= " " +idCols.get(i)+ "*"+idCols.get(i).substring(1)+"+ " ;
+			}
+			else{ 
+				fromPart+= "(select "+idCols.get(i)+" from test) ";
+				sumaCajas+=  " "+idCols.get(i)+" ";
+				if( idCols.get(i).equals("c05") )
+					sumaPesos+= " " +idCols.get(i)+ "*0.5  " ;
+				else
+					sumaPesos+= " " +idCols.get(i)+ "*"+idCols.get(i).substring(1)+" " ;
+			}
+			
+		}
+		
+		String q="select *  from"+fromPart+"  where "+sumaPesos+"="+kgAReempacar+" and "+sumaCajas+" <= all(select  "+sumaCajas+"  from "+fromPart+" where ("+sumaPesos+")= "+kgAReempacar+") " ;
+		
+		ArrayList<Integer> respuesta = new ArrayList<Integer>();
+		PreparedStatement prepStatement = null;
+		ResultSet rs = super.hacerQuery(q, prepStatement);
+		if(rs.next())
+		{
+			for(int i = 0 ; i < idCols.size() ; i++)
+			{
+				respuesta.add( rs.getInt( idCols.get(i) ) );
+			}
+		}
+				
+		return respuesta;	
+	
+	}
 	
 	
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
