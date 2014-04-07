@@ -114,7 +114,7 @@ public class ConsultaDAO {
 	/**
 	 * conexion con la base de datos
 	 */
-	public static Connection conexion;
+	private static Connection conexion;
 	
 	/**
 	 * nombre del usuario para conectarse a la base de datos.
@@ -182,7 +182,7 @@ public class ConsultaDAO {
 	 * @param clave clave de acceso a la base de datos
 	 * @throws SQLException si ocurre un error generando la conexi�n con la base de datos.
 	 */
-    private void establecerConexion() throws SQLException
+    public void establecerConexion() throws SQLException
     {
     	try
         {
@@ -210,13 +210,13 @@ public class ConsultaDAO {
      * @param con objeto de conexi�n a la base de datos
      * @throws SistemaCinesException Si se presentan errores de conexi�n
      */
-    public void closeConnection(Connection connection) throws Exception 
+    public void closeConnection() throws Exception 
     {        
     	System.out.println("conexión cerrada");
 		try 
 		{
-			connection.close();
-			connection = null;
+			conexion.close();
+			conexion = null;
 			
 		} catch (SQLException exception) {
 			throw new Exception("Error a la hora de cerrar una conexión");
@@ -231,8 +231,7 @@ public class ConsultaDAO {
     
     public ResultSet hacerQuery(String statement, PreparedStatement prepStmt) throws SQLException
     {
-    	establecerConexion();
-		prepStmt = conexion.prepareStatement(statement);		
+    	prepStmt = conexion.prepareStatement(statement);		
 		return prepStmt.executeQuery();
     }
     
@@ -245,8 +244,7 @@ public class ConsultaDAO {
     public int ejecutarTask(String statement, PreparedStatement prepStmt) throws SQLException
     {
     	
-    	establecerConexion();
-		prepStmt = conexion.prepareStatement(statement);
+    	prepStmt = conexion.prepareStatement(statement);
 		return prepStmt.executeUpdate();
     }
     

@@ -1,16 +1,12 @@
 package co.edu.uniandes.centralAbastos.dao;
 
-import java.nio.charset.CodingErrorAction;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.RowId;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import org.apache.velocity.runtime.parser.ParseException;
 
-import oracle.jdbc.proxy.annotation.Pre;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 
@@ -171,9 +167,9 @@ public class DAOAlmacen extends ConsultaDAO
 					System.out.println("Causa: " + e.getMessage());
 					if(e.getErrorCode() == 1)
 					{
-						System.out.println("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + peso_caja*cantidad + "WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'");
+						System.out.println("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + peso_caja*cantidad + " WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'");
 
-						super.ejecutarTask("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + cantidad + "WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'"  
+						super.ejecutarTask("UPDATE ITEM_INVENTARIO SET CANTIDAD = CANTIDAD + " + cantidad + " WHERE NOMB_PRODUCTO = '"+nomb_producto+"' AND COD_ALMACEN = '"+cod_almacen+"' AND PESO_CAJA = "+peso_caja+" AND FECHA_EXPIRACION = '"+fechaExpiracion+"'"  
 								, prepStmt);
 					}
 					
@@ -219,7 +215,9 @@ public class DAOAlmacen extends ConsultaDAO
 		{
 			System.out.println(AGREGAR_ALMACEN + query1);
 			System.out.println(AGREGAR_BODEGA + query2);
+			System.out.println(e.getErrorCode() + "error code");
 			e.printStackTrace();
+			return false;
 		}finally
 		{
 			super.cerrarStatement(prepStmt);
@@ -380,12 +378,13 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @return la capacidad en todas las bodegas distintas a codBodega. 
 	 * 		para retornar la capacidad de todas llamar el metodo con codBodega como cadena vacia.
 	 */
-	public double darCapacidadTotalDisp(String codBodega)
+	public double darCapacidadTotalDisp(String codBodega, String tipoProducto)
 	{
 		PreparedStatement prepStmt = null;
 		double resp = 0;
 		try {
-			ResultSet rs = super.hacerQuery( "select sum(capacidad-cantidad_producto) from almacen a join bodegas b on a.codigo=b.cod_almacen where b.cod_almacen !='"+codBodega+"'" , prepStmt);
+			System.out.println("SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO != '" + tipoProducto + "'" );
+			ResultSet rs = super.hacerQuery( "SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO = '" + tipoProducto + "'" , prepStmt);
 			if(rs.next())
 				resp = rs.getDouble(1);
 			

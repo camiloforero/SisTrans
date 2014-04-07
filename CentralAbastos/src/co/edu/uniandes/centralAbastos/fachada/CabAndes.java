@@ -47,6 +47,15 @@ public class CabAndes
 	private ModAlmacen modAlmacen;
 	
 	private ModLocal modLocal;
+	
+	
+	private ConsultaDAO dao;
+	
+	private DAOProducto daoProducto;
+	
+	private DAOPedido daoPedido;
+	
+	private DAOAlmacen daoAlmacen;
     
     // -----------------------------------------------------------------
     // Singleton
@@ -86,10 +95,18 @@ public class CabAndes
 	 */
 	public void inicializarRuta(String ruta)
 	{
-		this.ruta = ruta;
-		modPedidoDeOferta = new ModPedidoDeOferta(new DAOPedidosOferta(ruta));
-		modAlmacen = new ModAlmacen(new DAOAlmacen(ruta));
-		modLocal = new ModLocal(new DAOAlmacen(ruta), new DAOPedidoLocal(ruta));
+		if(this.ruta == null)
+		{
+			this.ruta = ruta;
+			dao = new ConsultaDAO(ruta);
+			daoPedido = new DAOPedido(ruta);
+			daoProducto = new DAOProducto(ruta);
+			daoAlmacen = new DAOAlmacen(ruta);
+			modPedidoDeOferta = new ModPedidoDeOferta(new DAOPedidosOferta(ruta));
+			modAlmacen = new ModAlmacen(daoAlmacen);
+			modLocal = new ModLocal(daoAlmacen, new DAOPedidoLocal(ruta));
+		}
+		
 	}
 	
     // ---------------------------------------------------
@@ -104,39 +121,59 @@ public class CabAndes
 	 */
 	public ArrayList<String> darTipos() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("tipos");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("tipos");
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList<String> darNombresProductos() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("productos");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("productos");
+		dao.closeConnection();
+		return ans;
+		
+		
 	}
 	public ArrayList<String> darPresentaciones() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("presentaciones");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("presentaciones");
+		dao.closeConnection();
+		return ans;
 	}
 	
 	
 	
+	/**
+	 * Da los códigos de todas las bodegas que están abiertas</br>
+	 * @return ArrayList con los códigos solicitados
+	 * @throws Exception
+	 */
 	public ArrayList<String> darCodigosBodegasAbiertas() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("bodegasAbiertas");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("bodegasAbiertas");
+		dao.closeConnection();
+		return ans;		
 	}
 	
 	public ArrayList<String> darCodigosBodegasCerradas() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("bodegasCerradas");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("bodegasCerradas");
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList<String> darLocales() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("locales");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("locales");
+		dao.closeConnection();
+		return ans;
+		
 	}
 	
 	/**
@@ -146,41 +183,57 @@ public class CabAndes
 	 */
 	public ArrayList<String> darCodigosBodegas() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("bodegas");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("bodegas");
+		dao.closeConnection();
+		return ans;
 	}
 	
+	/**
+	 * Da una lista con los correos electrónicos de todos los usuarios</br>
+	 * @return ArrayList con la lista solicitada
+	 * @throws Exception
+	 */
 	public ArrayList<String> darUsuarios() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("usuarios");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("usuarios");
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList<String> darIdsPedidosEfectivos() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darListaSimple("pedidosEfectivos");
+		dao.establecerConexion();
+		ArrayList<String> ans = dao.darListaSimple("pedidosEfectivos");
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList<ProductosValue> darResultadoBusquedaProductos(String parametros) throws Exception
 	{
-		DAOProducto dao = new DAOProducto(ruta);
-		return dao.darProductos(parametros);
+		dao.establecerConexion();
+		ArrayList<ProductosValue> ans = daoProducto.darProductos(parametros);
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList[] darUsuariosPorTipo() throws Exception
 	{
-		ConsultaDAO dao = new ConsultaDAO(ruta);
-		return dao.darUsuariosPorTipo();
+		dao.establecerConexion();
+		ArrayList[] ans = dao.darUsuariosPorTipo();
+		dao.closeConnection();
+		return ans;
 	}
 	
 	public ArrayList<ArrayList<String>> darResultadoBusquedaPedidos(String tipoUsuario, String nombreUsuario, String parametros) throws Exception
 	{
-		DAOPedido dao = new DAOPedido(ruta);
+		dao.establecerConexion();
 		ArrayList<ArrayList<String>> respuesta = new ArrayList<ArrayList<String>>();
-		ArrayList<PedidosValue> listaInicial = dao.darPedidos(tipoUsuario, nombreUsuario, parametros);
+		ArrayList<PedidosValue> listaInicial = daoPedido.darPedidos(tipoUsuario, nombreUsuario, parametros);
 		for(int i = 0; i < listaInicial.size(); i++)
 			respuesta.add(listaInicial.get(i).toArrayList());
+		dao.closeConnection();
 		return respuesta;
 	}
 	
@@ -194,12 +247,12 @@ public class CabAndes
 
 	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
-		DAOAlmacen dao = new DAOAlmacen(ruta);
-
-
+		dao.establecerConexion();
+		daoAlmacen = new DAOAlmacen(ruta);
 		ArrayList<ArrayList<String>> respuesta = new ArrayList<ArrayList<String>>();
-		for(AlmacenValue av : dao.darInformacionBodegas())
+		for(AlmacenValue av : daoAlmacen.darInformacionBodegas())
 			respuesta.add(av.toArrayList());
+		dao.closeConnection();
 		return respuesta;
 
 	}
@@ -358,9 +411,9 @@ public class CabAndes
 		 * <b>post: <b>La bodega ahora está cerrado
 		 * @param codigo: ID único de la bodega
 		 */
-		public void cerrarBodega(String codigo) throws Exception
+		public boolean cerrarBodega(String codigo) throws Exception
 		{
-			modAlmacen.cerrarBodega(codigo);
+			return modAlmacen.cerrarBodega(codigo);
 		}
 
 		/**
@@ -371,6 +424,7 @@ public class CabAndes
 		 */
 		public void abrirBodega(String codigo) throws Exception
 		{
+			
 			modAlmacen.abrirBodega(codigo);
 			
 		}

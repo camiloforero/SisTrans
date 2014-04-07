@@ -38,14 +38,19 @@ public class ServletResultadoCerrarBodega extends ServletTemplate
 		
 		try 
 		{
-			CabAndes.darInstancia().cerrarBodega(codigo);
+			boolean resp = CabAndes.darInstancia().cerrarBodega(codigo);
+			if(resp)
+				imprimirMensajeOk(respuesta, "Success!", "La bodega ha sido cerrada satisfactoriamente");
+			else
+				imprimirMensajeError(respuesta, "Oh no!", "No fue posible redistribuir el contenido de la bodega");
+			
 		}
 		catch (Exception e) 
 		{
 			this.imprimirMensajeError(respuesta, "Error", "Hubo una excepción", e);
 			e.printStackTrace();
 		}
-		imprimirMensajeOk(respuesta, "Success!", "La bodega ha sido cerrada satisfactoriamente");
+		
 		
 	}
 

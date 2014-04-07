@@ -3,6 +3,7 @@ package co.edu.uniandes.centralAbastos.fachada;
 import java.util.ArrayList;
 
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
+import co.edu.uniandes.centralAbastos.excepciones.TransactionFailedException;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
@@ -27,7 +28,10 @@ public class ModAlmacen
 	
 	boolean agregarBodega(AlmacenValue value) throws Exception
 	{
-		return dao.agregarBodega(value);
+		dao.establecerConexion();
+		boolean ans = dao.agregarBodega(value);
+		dao.closeConnection();
+		return ans;
 	}
 	
 	////////////////////////////////////////////////////////////////////
@@ -79,22 +83,23 @@ public class ModAlmacen
 	{
 		
     	AlmacenValue bodegaToMod = dao.darBodega(codBodega);
+    	if(bodegaToMod.getCantidad_kg() == 0) return true;
     	ArrayList<ItemInventarioValue> existenciasBodega = dao.darExistenciasDeUnaBodega(codBodega); // TODO interacciones transaccionalidad
     	for (ItemInventarioValue it : existenciasBodega) {
 			System.out.println(existenciasBodega.size() + " " + it.getNomb_producto());
 		}
 		
-    	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega); 
-    	System.out.println(capTotalDisp);
+    	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega, bodegaToMod.getTipoProducto()); 
+    	System.out.println("Capacidad total disponible en otras bodegas " + capTotalDisp);
     	boolean resp = false;
-    	if( (capTotalDisp-bodegaToMod.getCantidad_kg()) >= bodegaToMod.getCantidad_kg() ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
+    	if( (capTotalDisp-bodegaToMod.getCantidad_kg()) >= 0 ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
     	{
     		// Se almacena el pedido. 
     		for (ItemInventarioValue iiv : existenciasBodega) {
    			 	resp = this.almacenarItemEnOtrasBodegasDesdeUnaBodega(iiv, bodegaToMod.getTipoProducto());
     		}
     	}
-    	
+    	System.out.println("Respuesta en reasignar existencias " + resp);
     	return resp;
 	}
    
@@ -128,13 +133,10 @@ public class ModAlmacen
 						return true;
 					}
 				}
-				
+				System.out.println("Método almacenarEnOtrasBodegas");
 				/**  */
-				double d = this.almacenarEnDistintasBodegas(item, bodegasDisponibles, num_cajas, Wcajas);
-				if(d >= 5.0) // tratar de almacenar de nuevo. Se pueden perder un numero maximo de kilos que se definen en el if.
-					return true; // La idea es que vuelva a almacenar hasta reducir a una tolerancia.
-					
-				return false;
+				return this.almacenarEnDistintasBodegas(item, bodegasDisponibles, num_cajas, Wcajas);
+				
 				
 		    }
 		    
@@ -150,7 +152,7 @@ public class ModAlmacen
 		     * @return - El numero de cajas de "Wcajas" kg que faltaron por almacenar. En caso de que no se cupla la pre, retorna el numero -10000.0
 		     */
     
-		    private double almacenarEnDistintasBodegas(Object o , ArrayList<AlmacenValue> bodegasDisponibles, int num_cajas, double Wcajas ) throws Exception
+		    private boolean almacenarEnDistintasBodegas(Object o , ArrayList<AlmacenValue> bodegasDisponibles, int num_cajas, double Wcajas ) throws Exception
 		    {
 		    	int capRequeridaXcajas = num_cajas; // Numero de cajas donde hay espacio
 				double capDisp_kg = -10000.0 ;
@@ -185,20 +187,22 @@ public class ModAlmacen
 							
 
 							dao.updateAlmacen( capRequeridaXcajas*Wcajas , bodega.getCodigo());
-							break;
+							return true;
 
 						}
 			    	}
+			    	return false;
 		    
 				}
 				else //if ( o instanceof ItemInventarioValue)
 				{
 					o = ((ItemInventarioValue) o);
+					int r = 0;
 					for (AlmacenValue bodega : bodegasDisponibles)
 			    	{
 						capDisp_kg = bodega.getCapacidad()-bodega.getCantidad_kg() ;
 						int capDispXcajas = (int) ( capDisp_kg/Wcajas) ;
-						int r = capRequeridaXcajas-capDispXcajas; // Espacio disponible en terminos de cajas con presentacion Wcajas
+						r = capRequeridaXcajas-capDispXcajas; // Espacio disponible en terminos de cajas con presentacion Wcajas
 						if( r > 0 )
 						{
 							
@@ -219,12 +223,12 @@ public class ModAlmacen
 							
 
 							dao.updateAlmacen(capRequeridaXcajas*Wcajas , bodega.getCodigo());
-							break;
+							return true;
 						}
 			    	}
+					return false;
+					
 				}
-			
-				return capDisp_kg;
 				
 		    }
 		    
@@ -288,29 +292,78 @@ public class ModAlmacen
 	public boolean eliminarBodega(String codigo) throws Exception
 	{
 		// modificado para que incluya lo el movimiento de existencias
-		boolean r = this.reasignarExistencias(codigo);
-		
-		return dao.eliminarBodega(codigo) && r ;
+		dao.establecerConexion();
+		dao.setAutocommit(false);
+		try
+		{
+			boolean resp = this.reasignarExistencias(codigo);
+			
+			if(resp)
+			{
+				dao.eliminarBodega(codigo);
+				System.out.println("commit");
+				dao.commit();
+				dao.setAutocommit(true);
+				dao.closeConnection();
+				return resp;
+			}		
+			else
+			{
+				System.out.println("Rollback");
+				dao.rollback();
+				return resp;
+			}
+			
+		}
+		catch(Exception e)
+		{
+			dao.rollback();
+			dao.setAutocommit(true);
+			dao.closeConnection();
+			throw new TransactionFailedException("Hubo un error a la hora de realizar la transacción ", e);
+		}
 	}
 
 	public boolean cerrarBodega(String codigo) throws Exception 
 	{
 		// modificado para que incluya lo el movimiento de existencias
-		System.out.println("Cerrar bodega " + codigo);
-		boolean resp = this.reasignarExistencias(codigo);
-		
-		if(resp)
+		dao.establecerConexion();
+		dao.setAutocommit(false);
+		try
 		{
-			dao.cerrarBodega(codigo);
-			return true;
+			boolean resp = this.reasignarExistencias(codigo);
+			
+			if(resp)
+			{
+				dao.cerrarBodega(codigo);
+				System.out.println("commit");
+				dao.commit();
+				dao.setAutocommit(true);
+				dao.closeConnection();
+				return resp;
+			}		
+			System.out.println("rollback");
+			dao.rollback();
+			dao.setAutocommit(true);
+			dao.closeConnection();
+			return resp;
 		}
-		else 
-			return false;
+		catch(Exception e)
+		{
+			System.out.println("rollback");
+			dao.rollback();
+			dao.setAutocommit(true);
+			dao.closeConnection();
+			throw new TransactionFailedException("Hubo un error a la hora de realizar la transacción ", e);
+		}
+		
 	}
 	
 	public void abrirBodega(String codigo) throws Exception
 	{
+		dao.establecerConexion();
 		dao.abrirBodega(codigo);
+		dao.closeConnection();
 	}
 
 }
