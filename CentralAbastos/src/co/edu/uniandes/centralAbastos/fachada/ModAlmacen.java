@@ -239,6 +239,7 @@ public class ModAlmacen
 		    	dao.updateCantidadCajas(producto, pesoCaja, -cajasSolicitadas ,idBodega,fechaExpProducto);
 		    	dao.updateAlmacen(-cajasSolicitadas*pesoCaja, idBodega);
 		    }
+
 		    
 		    /**
 		     * 
@@ -263,19 +264,8 @@ public class ModAlmacen
 		    }
 		    
 		    
-		    
-		/**
-		 * 
-		 * @param idPedidoLocal
-		 * @param itemsExtraibles - tupalas de items de los cuales se van a sacar existencias. 
-		 * @return
-		 */
-		 public boolean moverExistenciasDeBodegaALocal_I (String idPedidoLocal , ArrayList<ItemInventarioValue> itemsExtraibles )
-		 {
-			 // Consultar los items de el pedido local 
-			 
-			 return false;
-		 }
+
+		
 
 		    
 		    

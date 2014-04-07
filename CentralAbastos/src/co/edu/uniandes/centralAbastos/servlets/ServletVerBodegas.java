@@ -5,8 +5,10 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import co.edu.uniandes.centralAbastos.fachada.CabAndes;
 import co.edu.uniandes.centralAbastos.vistas.Vista;
 import co.edu.uniandes.centralAbastos.vistas.VistaTablaSimple;
+import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 
 public class ServletVerBodegas extends ServletTemplate
 {
@@ -32,7 +34,14 @@ public class ServletVerBodegas extends ServletTemplate
 	public void escribirContenido(HttpServletRequest request, HttpServletResponse response) throws IOException 
 	{
 		Vista vista = new VistaTablaSimple();
-		
+		vista.put("headers", AlmacenValue.darHeaders());
+		try {
+			vista.put("items", CabAndes.darInstancia().darInformacionBodegas());
+			vista.imprimirVista(response.getWriter());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 	}

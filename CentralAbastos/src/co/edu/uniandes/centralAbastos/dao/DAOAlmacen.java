@@ -392,9 +392,14 @@ public class DAOAlmacen extends ConsultaDAO
 		
 			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
 			
-			while(rs.next()){
-				AlmacenValue val = new AlmacenValue(rs.getString("A.CODIGO"), rs.getDouble("A.CAPACIDAD"), rs.getDouble("A.CANTIDAD_PRODUCTO") , rs.getString("A.TIPO_PRODUCTO"));
-				val.setEstado("B.ESTADO");
+			while(rs.next())
+			{
+				System.out.println(rs.getString("CODIGO"));
+				System.out.println(rs.getDouble("CAPACIDAD"));
+				System.out.println(rs.getDouble("CANTIDAD_PRODUCTO"));
+				System.out.println(rs.getString("TIPO_PRODUCTO"));
+				AlmacenValue val = new AlmacenValue(rs.getString("CODIGO"), rs.getDouble("CAPACIDAD"), rs.getDouble("CANTIDAD_PRODUCTO") , rs.getString("TIPO_PRODUCTO"));
+				val.setEstado(rs.getString("ESTADO"));
 				a.add(val);
 				
 			}
@@ -524,7 +529,8 @@ public class DAOAlmacen extends ConsultaDAO
 			
 		}
 		
-		String q="select *  from"+fromPart+"  where "+sumaPesos+"="+kgAReempacar+" and "+sumaCajas+" <= all(select  "+sumaCajas+"  from "+fromPart+" where ("+sumaPesos+")= "+kgAReempacar+") " ;
+		String q="select *  from "+fromPart+"  where "+sumaPesos+"="+kgAReempacar+" and "+sumaCajas+" <= all(select  "+sumaCajas+"  from "+fromPart+" where ("+sumaPesos+")= "+kgAReempacar+") " ;
+		System.out.println("Checkeo de la query_: "+q);
 		
 		ArrayList<Integer> respuesta = new ArrayList<Integer>();
 		PreparedStatement prepStatement = null;
@@ -543,16 +549,4 @@ public class DAOAlmacen extends ConsultaDAO
 	
 	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

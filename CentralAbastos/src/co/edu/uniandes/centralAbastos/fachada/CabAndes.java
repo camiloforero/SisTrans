@@ -185,10 +185,24 @@ public class CabAndes
 		return respuesta;
 	}
 	
+	/**
+	 * Retorna una ArrayList que contiene más ArrayLists, las cuales contienen información sobre una bodega.</br>
+	 * <b>pre: <b> </br>
+	 * <b>post: <b>
+	 * @return
+	 * @throws Exception
+	 */
+
 	public ArrayList<ArrayList<String>> darInformacionBodegas() throws Exception
 	{
 		DAOAlmacen dao = new DAOAlmacen(ruta);
-		return null; // dao.darInformacionBodegas();
+
+
+		ArrayList<ArrayList<String>> respuesta = new ArrayList<ArrayList<String>>();
+		for(AlmacenValue av : dao.darInformacionBodegas())
+			respuesta.add(av.toArrayList());
+		return respuesta;
+
 	}
 	
 	
@@ -278,6 +292,7 @@ public class CabAndes
 		 
 		 // Req 3.2- 3.4Iter 2
 		
+
 		 /**
 		  * Requerimiento 2.2
 		  * @param idPedidoLocal
@@ -287,8 +302,11 @@ public class CabAndes
 		  * @param cantidad_Cajas_Pedido
 		  * @param fechaExp
 		  * @return
+		 * @throws Exception 
 		  */
+
 		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp ) throws Exception
+
 		 {
 			 // Sacar el id del local.
 			 String idLocal = modLocal.darCodigoLocalSegunPedido(idPedidoLocal);
@@ -301,6 +319,13 @@ public class CabAndes
 		 }
 		
 		 /* Requerimiento 3.3 : vender productos en local*/
+		 /**
+		  * 
+		  * @param nombProducto
+		  * @param idLocal
+		  * @param pesoVendido
+		  * @return
+		  */
 		 public boolean RealizarVentaEnLocal( String nombProducto, String idLocal, double  pesoVendido )
 		 {
 			 try {
