@@ -33,8 +33,8 @@ public class ServletResultadoAbrirBodega extends ServletTemplate
 	{
 
 		PrintWriter respuesta = response.getWriter();
-		String codigo = request.getParameter("codigo");
-		System.out.println(request.getParameter("codigo"));
+		String codigo = request.getParameter("item");
+		System.out.println(request.getParameter("item"));
 		
 		try 
 		{

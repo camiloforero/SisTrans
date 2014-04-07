@@ -46,12 +46,15 @@ public class ModAlmacen
 		int num_cajas = pedidoEntrante.getCantidad();
 		double Wcaja = pedidoEntrante.getPresentacion();
 		ArrayList<AlmacenValue> bodegasDisp = dao.darBodegasXTipo(pedidoEntrante.getTipoProducto(), "" ); // TODO : transaccionalidad "Select for update para evitar lecturas sucias"
-		for (AlmacenValue bod : bodegasDisp) {
+		for (AlmacenValue bod : bodegasDisp) 
+		{
 			double capDisp = bod.getCapacidad() - bod.getCantidad_kg();
 			capDisp -= num_cajas*Wcaja;
+			System.out.println(capDisp);
 			if( capDisp >= 0 ){
-				dao.updateAlmacen(num_cajas*Wcaja , bod.getCodigo()); // TODO : transaccionalidad 
 				dao.insertarEnInventario(pedidoEntrante.getProducto(), pedidoEntrante.getTipoProducto(), bod.getCodigo(), Wcaja, num_cajas, pedidoEntrante.getFechaExpiracion());
+				dao.updateAlmacen(num_cajas*Wcaja , bod.getCodigo()); // TODO : transaccionalidad 
+				
 				return true;
 			}
 		}
@@ -77,8 +80,12 @@ public class ModAlmacen
 		
     	AlmacenValue bodegaToMod = dao.darBodega(codBodega);
     	ArrayList<ItemInventarioValue> existenciasBodega = dao.darExistenciasDeUnaBodega(codBodega); // TODO interacciones transaccionalidad
-    	
+    	for (ItemInventarioValue it : existenciasBodega) {
+			System.out.println(existenciasBodega.size() + " " + it.getNomb_producto());
+		}
+		
     	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega); 
+    	System.out.println(capTotalDisp);
     	boolean resp = false;
     	if( capTotalDisp >= bodegaToMod.getCantidad_kg() ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
     	{
@@ -272,6 +279,7 @@ public class ModAlmacen
 	public boolean cerrarBodega(String codigo) throws Exception 
 	{
 		// modificado para que incluya lo el movimiento de existencias
+		System.out.println("Cerrar bodega " + codigo);
 		boolean resp = this.reasignarExistencias(codigo);
 		if(resp)
 		{

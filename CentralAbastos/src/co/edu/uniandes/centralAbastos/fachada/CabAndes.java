@@ -25,7 +25,6 @@ import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
 import co.edu.uniandes.centralAbastos.vos.ProductosValue;
-import co.edu.uniandes.centralAbastos.vos.VideosValue;
 
 /**
  * Clase VideoAndes, que representa la fachada de comunicaci�n entre
@@ -248,6 +247,7 @@ public class CabAndes
 	  */
 	 public PedidoEfectivoValue darOfertaGanadora(String idPedidoOferta) throws Exception
 	 {
+		 
 		 PedidoEfectivoValue pev = modPedidoDeOferta.darOfertaGanadora(idPedidoOferta);
 		 // agregar a a tabla de pedidos efectivos
 		 DAOPedidosEfectivos d = new DAOPedidosEfectivos(this.ruta);
@@ -265,23 +265,26 @@ public class CabAndes
 		  * @param idPedidoEfectivo
 		  * @throws Exception
 		  */
-		 public void registrarEntregaDeProveedor(String idPedidoEfectivo) throws Exception
+	 public void registrarEntregaDeProveedor(String idPedidoEfectivo) throws Exception
+	 {
+		 DAOPedidosEfectivos daoPE = new DAOPedidosEfectivos(ruta);
+		 PedidoEfectivoValue pedidoEntrante = daoPE.darPedidoEfectivo(idPedidoEfectivo);
+		 System.out.println(pedidoEntrante.getFechaExpiracion());
+		 if(this.asignarEnBodegas(pedidoEntrante))
 		 {
-			DAOPedidosEfectivos daoPE = new DAOPedidosEfectivos(ruta);
-			 
-			daoPE.registrarFechaLlegada(idPedidoEfectivo);
-			 
-			PedidoEfectivoValue pedidoEntrante = daoPE.darPedidoEfectivo(idPedidoEfectivo);
-			this.asignarEnBodegas(pedidoEntrante);
-			
-			proveedorDetallesValue pdv = daoPE.darDetallesProveedorDePedidoEfectivo(idPedidoEfectivo);
-			
-			// calficar al proveedor
-			int nuevaCal = (5-pdv.diasTarde) > 0 ? 5-pdv.diasTarde : 0 ;
-			int cal = ( (pdv.numEntregas/(pdv.numEntregas+1))*pdv.calificacion +  (1/(pdv.numEntregas+1))*nuevaCal ) ;
-			daoPE.updateValoresProveedor(pdv.correo, cal);
-			 
+			 daoPE.registrarFechaLlegada(idPedidoEfectivo);
+			 proveedorDetallesValue pdv = daoPE.darDetallesProveedorDePedidoEfectivo(idPedidoEfectivo);
+			 // calficar al proveedor
+			 int nuevaCal = (5-pdv.diasTarde) > 0 ? 5-pdv.diasTarde : 0 ;
+			 int cal = ( (pdv.numEntregas/(pdv.numEntregas+1))*pdv.calificacion +  (1/(pdv.numEntregas+1))*nuevaCal ) ;
+			 daoPE.updateValoresProveedor(pdv.correo, cal);
 		 }
+		 
+		 
+		 
+		
+			 
+	}
 		 
 		 // Req 2.2-2.4 Iter 2
 		
@@ -296,9 +299,9 @@ public class CabAndes
 		 /**
 		  * Asigna el pedido a bodegas.
 		  */
-		 private void asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
+		 private boolean asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
 		 {
-			 modAlmacen.asignarEnBodegas(pedidoEntrante);
+			 return modAlmacen.asignarEnBodegas(pedidoEntrante);
 		 }
 
 		/**
@@ -324,16 +327,7 @@ public class CabAndes
 			
 		}
 		 
-		public static void main (String args[])
-		{
-			CabAndes cab = CabAndes.darInstancia();
-			ConsultaDAO dao = new ConsultaDAO("C:\\Users\\Camilo\\git\\SisTrans\\CentralAbastos\\WebContent");
-			dao.commit();
-			
-		}
-		 
-		 
-	 
-
+		
+		
 
 }

@@ -1,4 +1,4 @@
-<form name="seleccion" action="$accion.get(0)" method="POST">
+<form name="seleccion" action="resultadoRegistrarPedido.htm" method="POST">
 	<div>
 		<span>
 			<select name="valor">
@@ -7,6 +7,10 @@
 				#end
 			</select>
         </span>
+		<span>
+			<input type="text"" name="cantidad"> <input type="hidden" name="producto" value="$producto" 
+				
+		</span> 				
 	</div>
 	<div>
 		<span>
