@@ -11,6 +11,11 @@ public class ModPedidoDeOferta
 	 */
 	DAOPedidosOferta dao;
 
+	
+	public DAOPedidosOferta getDao() {
+		return dao;
+	}
+
 	//-------------------------------
 	// Constructor
 	//-------------------------------

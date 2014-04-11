@@ -481,6 +481,24 @@ public class DAOAlmacen extends ConsultaDAO
 	}
 	
 	
+	public ArrayList<ItemInventarioValue> darExistenciasEnBodegas()
+	{
+		String q = ITEMS_INVENTARIO+ ", bodegas b  where ii.cod_almacen=b.cod_almacen";
+		PreparedStatement prepStmt = null;
+		ArrayList<ItemInventarioValue> resp = new ArrayList<ItemInventarioValue>();
+		try{
+			ResultSet rs = super.hacerQuery(q, prepStmt);
+			while(rs.next()){
+				ItemInventarioValue item = new ItemInventarioValue(rs.getString(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),rs.getString(5));
+				resp.add(item);
+				}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return resp;
+	}
 	
 	/////////////////////////////////// Consultas del local ///////////////////////////////////////////////////////////////////////
 	

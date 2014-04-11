@@ -10,7 +10,12 @@
  */
 package co.edu.uniandes.centralAbastos.fachada;
 
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import co.edu.uniandes.centralAbastos.dao.ConsultaDAO;
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
@@ -21,7 +26,10 @@ import co.edu.uniandes.centralAbastos.dao.DAOPedidosEfectivos.proveedorDetallesV
 import co.edu.uniandes.centralAbastos.dao.DAOPedidosOferta;
 import co.edu.uniandes.centralAbastos.dao.DAOProducto;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
+import co.edu.uniandes.centralAbastos.vos.InfoItemsSatisfacerValue;
+import co.edu.uniandes.centralAbastos.vos.InfoTiempoEntregaValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
+import co.edu.uniandes.centralAbastos.vos.ItemPedidoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
@@ -48,7 +56,7 @@ public class CabAndes
 	
 	private ModLocal modLocal;
 	
-	
+	private ModPedidos modPedidos;
 	private ConsultaDAO dao;
 	
 	private DAOProducto daoProducto;
@@ -65,6 +73,8 @@ public class CabAndes
     /**
      * Instancia �nica de la clase
      */
+	public final static String PEDIDO_COMPRADOR = "pedido_comprador";
+	public final static String PEDIDO_LOCAL = "pedido_local";
     private static CabAndes instancia;
     
     /**
@@ -103,8 +113,9 @@ public class CabAndes
 			daoProducto = new DAOProducto(ruta);
 			daoAlmacen = new DAOAlmacen(ruta);
 			modPedidoDeOferta = new ModPedidoDeOferta(new DAOPedidosOferta(ruta));
-			modAlmacen = new ModAlmacen(daoAlmacen);
 			modLocal = new ModLocal(daoAlmacen, new DAOPedidoLocal(ruta));
+			modAlmacen = new ModAlmacen(daoAlmacen, modLocal);
+			modPedidos = new ModPedidos(new DAOPedido(ruta));
 		}
 		
 	}
@@ -349,54 +360,162 @@ public class CabAndes
 		 // Req 3.2- 3.4Iter 2
 		
 
-		 /**
-		  * Requerimiento 2.2
-		  * @param idPedidoLocal
-		  * @param idBodega
-		  * @param nombProducto
-		  * @param pesoCaja
-		  * @param cantidad_Cajas_Pedido
-		  * @param fechaExp
-		  * @return
-		 * @throws Exception 
-		  */
-
-		 public boolean enviarPedidoAlLocal( String idPedidoLocal, String idBodega, String nombProducto, double pesoCaja, int cantidad_Cajas_Pedido, String fechaExp ) throws Exception
-
-		 {
-			 // Sacar el id del local.
+			 /**
+			  * Requerimiento 3.2			  
+			  * @param idPedidoLocal
+			  * @param idBodega
+			  * @param nombProducto
+			  * @param pesoCaja
+			  * @param cantidad_Cajas_Pedido
+			  * @param fechaExp
+			  * @return
+			 * @throws Exception 
+			  */
+	
+			 public void enviarPedidoAlLocal(ArrayList<ItemPedidoValue> itemsSolicitados, String idLocal ) throws Exception
+			 {
+				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas();
+				 modAlmacen.moverExistenciasAlLocal(idLocal, itemsBodegas, itemsSolicitados);
+			 }
+			
+			 /* Requerimiento 3.3 : vender productos en local*/
+			 /**
+			  * 
+			  * @param nombProducto
+			  * @param idLocal
+			  * @param pesoVendido
+			  * @return
+			  */
+			 public boolean RealizarVentaEnLocal( String nombProducto, String idLocal, double  pesoVendido )
+			 {
+				 try {
+					return modLocal.venderProducto( nombProducto,idLocal, pesoVendido );
+				} 
+				 catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return false;
+			 }
 			 
-			 String idLocal = modLocal.darCodigoLocalSegunPedido(idPedidoLocal);
+			 // Requerimiento 3,4 : Movimiento del pedido comprador
 			 
-			 // descontarlas de la bodega.
-			 modAlmacen.descontarExistenciasDeBodega(idBodega, nombProducto, pesoCaja, fechaExp, cantidad_Cajas_Pedido);
+			 /**
+			  * Envia el pedido al comprador mayorista segun los items solicitados por este.
+			  */
+			 public void enviarPedidoAlComprador(ArrayList<ItemPedidoValue> itemsSolicitados) throws Exception
+			 {
+				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas();
+				 modAlmacen.sacarExistenciasSegunPedidoComprador(itemsBodegas, itemsSolicitados);
+			 }
 			 
-			 //  adicionarlas al local
-			return  modAlmacen.adicionarExistenciasEnItemInventario(idLocal, nombProducto, pesoCaja, fechaExp, cantidad_Cajas_Pedido);
-		 }
-		
-		 /* Requerimiento 3.3 : vender productos en local*/
-		 /**
-		  * 
-		  * @param nombProducto
-		  * @param idLocal
-		  * @param pesoVendido
-		  * @return
-		  */
-		 public boolean RealizarVentaEnLocal( String nombProducto, String idLocal, double  pesoVendido )
-		 {
-			 try {
-				return modLocal.venderProducto( nombProducto,idLocal, pesoVendido );
-			} 
-			 catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			 // Requerimiento 4 Registrar/SatisfacerPedido
+			 
+			 public void saisfacerPedidoComprador(ArrayList<ItemPedidoValue> itemsPedido) throws Exception
+			 {
+					ArrayList<InfoItemsSatisfacerValue> existenciasSatisfacenInfo = modPedidos.getDaoPedidos().darItemsParaSatisfacer( itemsPedido.get(0).getIdPedido() );
+					ArrayList<ItemPedidoValue> itemsRestantes = new ArrayList<ItemPedidoValue>();
+					for( int i = 0; i < existenciasSatisfacenInfo.size() ; i++)
+					{
+						InfoItemsSatisfacerValue temp = existenciasSatisfacenInfo.get(i);
+						if( temp.getRestante() > 0 ){
+							itemsRestantes.add(new ItemPedidoValue(temp.getIdPedido(), temp.getNombProducto(), temp.getPesoCaja(), temp.getRestante()) ); // quedan los que deben pedir auxiliar.
+							itemsPedido.remove( i ); // quedan los que se pueden satisfacer
+						}
+					}
+					
+					
+					// satisfago lo que puedea del pedido, que en el mejor de los casos es todo.
+					this.enviarPedidoAlComprador(itemsPedido);
+					if(!itemsRestantes.isEmpty()){
+						this.generarPedidoAux(itemsRestantes , PEDIDO_COMPRADOR);
+					}
 			}
-			return false;
-		 }
-		 
-		 
-		 // Iteracion # 3
+			 
+		 /**
+		  * Metodo de apoyo-
+		  * @param itemsRestantes
+		 * @throws SQLException 
+		 * @throws ParseException 
+		  */
+			private void generarPedidoAux(ArrayList<ItemPedidoValue> itemsRestantes, String tipoPedido) throws SQLException, Exception{
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yy");
+				if(tipoPedido.equals(PEDIDO_COMPRADOR)){
+					
+					Date maxFechaEntrega = sdf.parse("31/01/00");
+					boolean sePudo = false;
+					for (int i = 0 ; i < itemsRestantes.size() ; i++)
+					{
+						sePudo = false;
+						ItemPedidoValue temp = itemsRestantes.get(i);
+						ArrayList<InfoTiempoEntregaValue> infoEntregas = modPedidos.getDaoPedidos().darProyeccionDeExistencias(temp.getIdPedido(), temp.getNombProducto(), temp.getPesoCaja());
+						// infoEntregas tiene maximo 2 y minimo 1. El tiene el ultimo y el primero de la tabla calculada para apoyar.
+						InfoTiempoEntregaValue prim = infoEntregas.get(0);
+						InfoTiempoEntregaValue ult =  infoEntregas.get(1);
+						// el minimo en el rango.
+						int minimo = prim.getZ()-ult.getS();
+						int maximo = ult.getDelta();
+						if( minimo >= temp.getCantidad() )
+						{
+							Date d = sdf.parse(prim.getFecha_in()); // fecha del primero
+							if( d.compareTo(maxFechaEntrega) == 1 )
+							{
+								maxFechaEntrega=d;
+							}
+							sePudo = true;
+						}
+						else if(maximo >= temp.getCantidad() )
+						{
+							Date d = sdf.parse(ult.getFecha_in()); // fecha del ultimo 
+							if( d.compareTo(maxFechaEntrega) == 1 )
+							{
+								maxFechaEntrega=d;
+							}
+							sePudo = true;
+						}
+						if( !sePudo )
+							break;
+					}
+					
+					if( !sePudo )
+					{
+						System.out.println("pidio lo restante al proveedor: Peor caso");
+						this.pedirRestanteAProveedor(itemsRestantes);
+					}
+					else
+					{
+						// genero pedido comprador auxiliar.
+						String nID = daoPedido.generateNewId();
+						String correoComprador = daoPedido.consultarCorreoComprador(itemsRestantes.get(0).getIdPedido());
+						daoPedido.insertarNuevoPedidoComprador(correoComprador, sdf.format(maxFechaEntrega), nID);
+						for(int i = 0 ; itemsRestantes.size() > i ; i++)
+						{
+							ItemPedidoValue temp = itemsRestantes.get(i);
+							daoPedido.insertarItemPedidoComprador(temp, nID);
+						}
+						
+					}
+				}
+				else if(tipoPedido.equals(PEDIDO_LOCAL))
+				{
+					
+				}
+			
+			}
+			
+			
+			
+		// otro metodo de apoyo que comieza una nueva licitacion
+		private void pedirRestanteAProveedor(ArrayList<ItemPedidoValue> itemsRestantes) throws Exception {
+			for(int i = 0 ; i < itemsRestantes.size(); i++)
+			{
+				ItemPedidoValue temp = itemsRestantes.get(i);
+				modPedidoDeOferta.getDao().insertarOfertaNueva(temp);
+			}
+		}
+
+		// Iteracion # 3
 		 /**
 		  * Asigna el pedido a bodegas.
 		  */

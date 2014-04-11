@@ -3,8 +3,12 @@ package co.edu.uniandes.centralAbastos.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
+import co.edu.uniandes.centralAbastos.vos.ItemPedidoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoOfertaValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
@@ -101,6 +105,30 @@ public class DAOPedidosOferta extends ConsultaDAO
     	
 	}
 	
+	public int insertarOfertaNueva (ItemPedidoValue item ) throws Exception
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yy");
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		c.add(Calendar.DATE, 6);
+		String d = sdf.format( c.getTime() );
+		c.add(Calendar.DATE, -3);
+		String fc = sdf.format(c.getTime()); 
+		String q = "insert into pedido_oferta values of ('"+item.getNombProducto()+"','"+d+"','"+generateNewId()+"',"+item.getCantidad()+","+item.getPesoCaja()+","+fc+" )";
+		PreparedStatement prepStmt = null;
+		return super.ejecutarTask(q, prepStmt);
+	}
+	
+	public String generateNewId() throws SQLException
+	{
+		int resp = 0;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = super.hacerQuery(" SELECT MAX(ID) FROM ( SELECT CAST(ID AS INTEGER) AS ID FROM PEDIDO_OFERTA ) ", prepStmt);
+		if(rs.next())
+			resp = rs.getInt(1);
+			resp++;
+		return ""+resp;
+	}
 	/**
 	 * 
 	 * @param idPedido

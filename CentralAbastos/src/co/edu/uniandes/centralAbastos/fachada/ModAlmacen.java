@@ -3,9 +3,11 @@ package co.edu.uniandes.centralAbastos.fachada;
 import java.util.ArrayList;
 
 import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
+import co.edu.uniandes.centralAbastos.dao.DAOPedidoLocal;
 import co.edu.uniandes.centralAbastos.excepciones.TransactionFailedException;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
+import co.edu.uniandes.centralAbastos.vos.ItemPedidoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidoEfectivoValue;
 
 /**
@@ -20,10 +22,12 @@ public class ModAlmacen
 {
 	
 	private DAOAlmacen dao;
+	private ModLocal modLocal;
 
-	public ModAlmacen(DAOAlmacen dao) 
+	public ModAlmacen(DAOAlmacen dao, ModLocal modLocal) 
 	{
 		this.dao = dao;
+		this.modLocal = modLocal;
 	}
 	
 	boolean agregarBodega(AlmacenValue value) throws Exception
@@ -32,6 +36,11 @@ public class ModAlmacen
 		boolean ans = dao.agregarBodega(value);
 		dao.closeConnection();
 		return ans;
+	}
+	
+	public DAOAlmacen getDaoAlmacen()
+	{
+		return dao;
 	}
 	
 	////////////////////////////////////////////////////////////////////
@@ -277,8 +286,148 @@ public class ModAlmacen
 		    
 		    
 
-		
-
+		    /**
+		     * El metodo saca las existencias las existencias del inventario de bodegas, que se solicitan por los items del pedido
+		     * @pre : Las existencias en bodega son suficientes para suplir los items demandados. 
+		     * @param - itemBodegas:  son las existencias de las que se va a sacar los items solicitados.
+		     * @param - itemSolicitados: son los items que se van a extraer. 
+		     * @throws Exception 
+		     */
+		    public void sacarExistenciasSegunPedidoComprador(ArrayList<ItemInventarioValue> itemsBodegas , ArrayList<ItemPedidoValue> itemsSolicitados) throws Exception
+		    {
+		    	 // O(n^2)
+		    	 for (ItemPedidoValue itemPedido : itemsSolicitados) {
+		    		 if(! removerExistenciasDeUnaTupla(itemPedido, itemsBodegas) )
+		    			 removerExistenciasDeVariasTuplas(itemPedido, itemsBodegas);
+				}
+		    }
+		    
+		    /**
+		     * Remueve existencias de una tupla, en item Inventario,  para proporcionar el insumo requerido por itemPedido
+		     * @return true si logro encontrar la tupla, o false dlc.
+		     * @throws Exception 
+		     */
+		    private boolean removerExistenciasDeUnaTupla(ItemPedidoValue itemPedido , ArrayList<ItemInventarioValue> itemsBodegas) throws Exception
+		    {
+		    	for(ItemInventarioValue itemInvTemp : itemsBodegas)
+		    	{
+		    		if( itemInvTemp.getPresentacion() == itemPedido.getPesoCaja() && itemInvTemp.getCantidad() >= itemPedido.getCantidad() && itemInvTemp.getNomb_producto().equals(itemPedido.getNombProducto()) )
+		    		{
+		    			this.descontarExistenciasDeBodega(itemInvTemp.getCod_almacen(), itemPedido.getNombProducto(), itemPedido.getPesoCaja(), itemInvTemp.getFechaExp(), itemPedido.getCantidad());
+		    			return true;
+		    		}
+		    	}
+		    	return false;
+		    }
+		    
+		    /**
+		     * Remueve existencias de varias tuplas para proporcionar el insumo requerido por itemPedido.
+		     * @pre: Hay suficiente insumo para satisfacer el itemPedido.
+		     * @throws Exception 
+		     */
+		    private void removerExistenciasDeVariasTuplas( ItemPedidoValue itemPedido , ArrayList<ItemInventarioValue> itemsBodegas ) throws Exception
+		    {
+		    	int boxesToRemove = itemPedido.getCantidad();
+		    	double Wcaja = itemPedido.getPesoCaja();
+		    	for (ItemInventarioValue tempIIV : itemsBodegas) {
+					if(tempIIV.getNomb_producto().equals(itemPedido.getNombProducto()) && tempIIV.getPresentacion() == Wcaja && tempIIV.getCantidad() > 0 )
+					{
+						int boxesAvailable = tempIIV.getCantidad(); // Cajas available en cada tupla de itemInv
+						if( boxesToRemove > boxesAvailable )
+						{
+							descontarExistenciasDeBodega(tempIIV.getCod_almacen(), tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(),  boxesAvailable  );
+							boxesToRemove -= boxesAvailable;
+						}
+						else if( boxesToRemove <= boxesAvailable )
+						{
+							descontarExistenciasDeBodega(tempIIV.getCod_almacen(), tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(),  boxesToRemove  );
+							boxesToRemove -= boxesAvailable;
+							break;
+						}
+					}
+		    	}
+		    	
+		    	if( boxesToRemove > 0 )
+		    		throw new Exception("Esto no debe pasar");
+		    }
+		    
+		    
+		    //// PILAS QUE LOS METODOS NO SON LO MISMOS QUE ARRIBA YA QUE EN LOS QUE VIENEN ACONTINUACION, HAY MOVIMIENTO HACIA EL LOCAL.
+		    /**
+		     * El metodo saca las existencias las existencias del inventario de bodegas, que se solicitan por los items del pedido
+		     * @pre : Las existencias en bodega son suficientes para suplir los items demandados. 
+		     * @param - itemBodegas:  son las existencias de las que se va a sacar los items solicitados.
+		     * @param - itemSolicitados: son los items que se van a extraer. 
+		     * @throws Exception 
+		     */
+		    public void moverExistenciasAlLocal(String idLocal,ArrayList<ItemInventarioValue> itemsBodegas , ArrayList<ItemPedidoValue> itemsSolicitados) throws Exception
+		    {
+		    	 // O(n^2)
+		    	 for (ItemPedidoValue itemPedido : itemsSolicitados) {
+		    		 if(! movilizarExistenciasDesdeUnaTupla(idLocal, itemPedido, itemsBodegas) )
+		    			 movilizarExistenciasDesdeVariasTuplas( idLocal, itemPedido, itemsBodegas);
+				}
+		    }
+		    
+		    /**
+		     * Remueve existencias de una tupla, en item Inventario,  para proporcionar el insumo requerido por itemPedido
+		     * @return true si logro encontrar la tupla, o false dlc.
+		     * @throws Exception 
+		     */
+		    private boolean movilizarExistenciasDesdeUnaTupla(String idLocal, ItemPedidoValue itemPedido , ArrayList<ItemInventarioValue> itemsBodegas) throws Exception
+		    {
+		    	for(ItemInventarioValue itemInvTemp : itemsBodegas)
+		    	{
+		    		if( itemInvTemp.getPresentacion() == itemPedido.getPesoCaja() && itemInvTemp.getCantidad() >= itemPedido.getCantidad() && itemInvTemp.getNomb_producto().equals(itemPedido.getNombProducto()) )
+		    		{
+		    			this.descontarExistenciasDeBodega(itemInvTemp.getCod_almacen(), itemPedido.getNombProducto(), itemPedido.getPesoCaja(), itemInvTemp.getFechaExp(), itemPedido.getCantidad());
+		    			return true;
+		    		}
+		    	}
+		    	return false;
+		    }
+		    
+		    /**
+		     * Remueve existencias de varias tuplas para proporcionar el insumo requerido por itemPedido.
+		     * @pre: Hay suficiente insumo para satisfacer el itemPedido.
+		     * @throws Exception 
+		     */
+		    private void movilizarExistenciasDesdeVariasTuplas( String idLocal, ItemPedidoValue itemPedido , ArrayList<ItemInventarioValue> itemsBodegas ) throws Exception
+		    {
+		    	int boxesToRemove = itemPedido.getCantidad();
+		    	double Wcaja = itemPedido.getPesoCaja();
+		    	for (ItemInventarioValue tempIIV : itemsBodegas) {
+					if(tempIIV.getNomb_producto().equals(itemPedido.getNombProducto()) && tempIIV.getPresentacion() == Wcaja && tempIIV.getCantidad() > 0 )
+					{
+						int boxesAvailable = tempIIV.getCantidad(); // Cajas available en cada tupla de itemInv
+						if( boxesToRemove > boxesAvailable )
+						{
+							descontarExistenciasDeBodega(tempIIV.getCod_almacen(), tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(),  boxesAvailable  );
+							modLocal.adicionarExistenciasEnItemInventario(idLocal, tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(), boxesAvailable);
+							boxesToRemove -= boxesAvailable;
+						}
+						else if( boxesToRemove <= boxesAvailable )
+						{
+							descontarExistenciasDeBodega(tempIIV.getCod_almacen(), tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(),  boxesToRemove  );
+							modLocal.adicionarExistenciasEnItemInventario(idLocal, tempIIV.getNomb_producto(), Wcaja, tempIIV.getFechaExp(), boxesToRemove );
+							boxesToRemove -= boxesAvailable;
+							break;
+						}
+					}
+		    	}
+		    	
+		    	if( boxesToRemove > 0 )
+		    		throw new Exception("Esto no debe pasar");
+		    }
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
+		    
 		    
 		    
 ////   END  ////////////////////////////////////////////////////
