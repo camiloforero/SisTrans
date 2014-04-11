@@ -7,6 +7,7 @@ import co.edu.uniandes.centralAbastos.dao.DAOAlmacen;
 import co.edu.uniandes.centralAbastos.dao.DAOPedidoLocal;
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
+import co.edu.uniandes.centralAbastos.vos.ItemPedidoValue;
 
 public class ModLocal 
 {
@@ -93,25 +94,35 @@ public class ModLocal
 	}
 	
 	
-	private void descontarExistenciasDeLocal(String nombProducto, String tipoProd, double wcajas, int cantidadCajas, String fechaExp, String idLocal) throws Exception
+	public void descontarExistenciasDeLocal(String nombProducto, String tipoProd, double wcajas, int cantidadCajas, String fechaExp, String idLocal) throws Exception
 	{
 		daoAlm.updateCantidadCajas(nombProducto, wcajas, -cantidadCajas ,idLocal,fechaExp);
     	daoAlm.updateAlmacen(-cantidadCajas*wcajas, idLocal);
 	}
 	
-	private boolean adicionarExistenciasEnItemInventario(String idAlmacen, String producto, double pesoCaja, String fechaExpProducto, int cajasToAdd) throws Exception
+	public boolean adicionarExistenciasEnItemInventario(String idLocal, String producto, double pesoCaja, String fechaExpProducto, int cajasToAdd) throws Exception
 	{
-	    	int up = daoAlm.updateCantidadCajas(producto, pesoCaja, cajasToAdd, idAlmacen, fechaExpProducto);
+	    	int up = daoAlm.updateCantidadCajas(producto, pesoCaja, cajasToAdd, idLocal, fechaExpProducto);
 	    	if( up == 0 ){
-	    		return daoAlm.insertarEnInventario(producto, daoAlm.darTipoProducto(producto), idAlmacen, pesoCaja, cajasToAdd, fechaExpProducto);
+	    		return daoAlm.insertarEnInventario(producto, daoAlm.darTipoProducto(producto), idLocal, pesoCaja, cajasToAdd, fechaExpProducto);
 	    	}
 	    	
-	    	daoAlm.updateAlmacen(cajasToAdd*pesoCaja, idAlmacen);
+	    	daoAlm.updateAlmacen(cajasToAdd*pesoCaja, idLocal);
 	    	
 	    	return true;
 	 }
 	
 	
 	
+	
+	/**
+	 * Consulta las existencias de un local.
+	 * @param idLocal
+	 * @return Tuplas de un local.
+	 */
+	public ArrayList<ItemInventarioValue> darExistenciasDeUnLocal(String idLocal)
+	{
+		return daoAlm.darExistenciasDeUnaBodega(idLocal);
+	}
 	
 }

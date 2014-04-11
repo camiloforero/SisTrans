@@ -6,9 +6,14 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.lang.NotImplementedException;
 
+import co.edu.uniandes.centralAbastos.vos.InfoItemsSatisfacerValue;
+import co.edu.uniandes.centralAbastos.vos.InfoTiempoEntregaValue;
+import co.edu.uniandes.centralAbastos.vos.ItemPedidoValue;
 import co.edu.uniandes.centralAbastos.vos.PedidosValue;
 import co.edu.uniandes.centralAbastos.vos.ProductosValue;
 
@@ -155,5 +160,137 @@ public class DAOPedido extends ConsultaDAO
 	 }
 	 	return ans;
 	}
+ 
+ 	public ArrayList<InfoTiempoEntregaValue> darProyeccionDeExistencias(String idPedidoComprador, String nombProd, double pesoCaja) throws SQLException
+ 	{
+ 		String q = 
+ 				"Select  * from "
+ 				      +" (Select * from pedidos_comprador pc join ITEMS_PEDIDO_COMPRADOR ipc on pc.id=ipc.id_pedido_comprador where pc.id='"+idPedidoComprador+"' )p join "
+ 				      +" (SELECT j1.fecha_entrega as Fecha_in , j2.fecha_entrega as Fecha_out, j1.nombre_producto, j1.PESO_CAJA, j1.CANTIDAD as num_cajas_in,-1*j2.CANTIDAD as num_cajas_out ,j1.Z,j2.S, (j1.Z - j2.S) as delta  from " 
+ 				      + " ((select po.FECHA_ENTREGA ,po.NOMBRE_PRODUCTO,po.PESO_CAJA,po.CANTIDAD , sum(po.cantidad) over (PARTITION by po.peso_caja,po.NOMBRE_PRODUCTO order by po.FECHA_ENTREGA) as Z "
+ 				       +" from pedido_oferta po  order by po.fecha_entrega,po.NOMBRE_PRODUCTO)j1 join "
+ 				       + " (select fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD , sum(cantidad) over (partition by nombre_producto,peso_caja order by fecha_entrega) AS S from "
+ 				       + " (select * from" 
+ 				              +" (select pc.fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD from items_pedido_comprador ipc join pedidos_comprador pc on  pc.id = ipc.id_pedido_comprador where pc.STATUS is not null)x "
+ 				              +" union all"
+ 				              +" (select pl.fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD from items_pedido_local ipl join pedido_local pl on pl.id = ipl.id_pedido_local where pl.STATUS is not null ) ) "
+ 				        +" )j2 "
+ 				        +" on j1.nombre_producto=j2.nombre_producto and j1.peso_caja=j2.peso_caja and j1.fecha_entrega<=j2.fecha_entrega)"
+ 				       + " where j1.nombre_producto= '"+nombProd+"'-- and j1.PESO_CAJA="+pesoCaja+" " 
+ 				       +" order by j1.fecha_entrega,j2.fecha_entrega) q on (q.nombre_producto=p.nombre_producto and q.peso_caja=p.peso_caja) ";
+ 		ArrayList<InfoTiempoEntregaValue> resp = new ArrayList<InfoTiempoEntregaValue>();
+ 		try{
+	 		PreparedStatement prepStmt = null;
+	 		ResultSet rs = super.hacerQuery(q, prepStmt);
+	 		
+	 		if(rs.first())
+	 			resp.add( new InfoTiempoEntregaValue(rs.getInt(8), rs.getString(9), rs.getInt(15),  rs.getInt(16),  rs.getInt(17)));
+	 		
+	 		if(rs.next())
+	 		{
+	 			rs.last();
+	 			resp.add( new InfoTiempoEntregaValue(rs.getInt(8), rs.getString(9), rs.getInt(15),  rs.getInt(16),  rs.getInt(17)));
+	 		}
+	 		
+ 		}
+ 		catch(SQLException e)
+ 		{
+ 			throw e;
+ 		}
+ 		
+ 		return resp;
+ 	}
 
+ 	public ArrayList<InfoTiempoEntregaValue> darProyDeExistencias(String idPedidoLocal, String nombProd, double pesoCaja) throws SQLException
+ 	{
+ 		String q = 
+ 				"Select  * from "
+ 				      +" (Select * from pedido_local pc join ITEMS_pedido_local ipc on pc.id=ipc.id_pedido_local where pc.id='"+idPedidoLocal+"' )p join "
+ 				      +" (SELECT j1.fecha_entrega as Fecha_in , j2.fecha_entrega as Fecha_out, j1.nombre_producto, j1.PESO_CAJA, j1.CANTIDAD as num_cajas_in,-1*j2.CANTIDAD as num_cajas_out ,j1.Z,j2.S, (j1.Z - j2.S) as delta  from " 
+ 				      + " ((select po.FECHA_ENTREGA ,po.NOMBRE_PRODUCTO,po.PESO_CAJA,po.CANTIDAD , sum(po.cantidad) over (PARTITION by po.peso_caja,po.NOMBRE_PRODUCTO order by po.FECHA_ENTREGA) as Z "
+ 				       +" from pedido_oferta po  order by po.fecha_entrega,po.NOMBRE_PRODUCTO)j1 join "
+ 				       + " (select fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD , sum(cantidad) over (partition by nombre_producto,peso_caja order by fecha_entrega) AS S from "
+ 				       + " (select * from" 
+ 				              +" (select pc.fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD from items_pedido_local ipc join pedido_local pc on  pc.id = ipc.id_pedido_local where pc.STATUS is not null)x "
+ 				              +" union all"
+ 				              +" (select pl.fecha_entrega,NOMBRE_PRODUCTO,PESO_CAJA,CANTIDAD from items_pedido_local ipl join pedido_local pl on pl.id = ipl.id_pedido_local where pl.STATUS is not null ) ) "
+ 				        +" )j2 "
+ 				        +" on j1.nombre_producto=j2.nombre_producto and j1.peso_caja=j2.peso_caja and j1.fecha_entrega<=j2.fecha_entrega)"
+ 				       + " where j1.nombre_producto= '"+nombProd+"'-- and j1.PESO_CAJA="+pesoCaja+" " 
+ 				       +" order by j1.fecha_entrega,j2.fecha_entrega) q on (q.nombre_producto=p.nombre_producto and q.peso_caja=p.peso_caja) ";
+ 		ArrayList<InfoTiempoEntregaValue> resp = new ArrayList<InfoTiempoEntregaValue>();
+ 		try{
+	 		PreparedStatement prepStmt = null;
+	 		ResultSet rs = super.hacerQuery(q, prepStmt);
+	 		
+	 		if(rs.first())
+	 			resp.add( new InfoTiempoEntregaValue(rs.getInt(8), rs.getString(9), rs.getInt(15),  rs.getInt(16),  rs.getInt(17)));
+	 		
+	 		if(rs.next())
+	 		{
+	 			rs.last();
+	 			resp.add( new InfoTiempoEntregaValue(rs.getInt(8), rs.getString(9), rs.getInt(15),  rs.getInt(16),  rs.getInt(17)));
+	 		}
+	 		
+ 		}
+ 		catch(SQLException e)
+ 		{
+ 			throw e;
+ 		}
+ 		
+ 		return resp;
+ 		
+ 	}
+ 	
+ 	
+ 	public ArrayList<InfoItemsSatisfacerValue> darItemsParaSatisfacer(String idPedidoComprador) throws SQLException
+ 	{
+ 		String q = "select ipc.ID_PEDIDO_COMPRADOR,j1.nomb_producto, ipc.PESO_CAJA, ipc.CANTIDAD, (ipc.CANTIDAD-j1.Q)as restante from (select nomb_producto,peso_caja, sum(cantidad) as q from ITEM_INVENTARIO group by nomb_producto,peso_caja)j1 join ITEMS_PEDIDO_COMPRADOR ipc on j1.PESO_CAJA = ipc.PESO_CAJA and j1.nomb_producto=ipc.NOMBRE_PRODUCTO "
+ 				+" where ipc.id_pedido_comprador = '"+idPedidoComprador+"' and q >= ipc.CANTIDAD";
+ 		PreparedStatement prepStmt = null;
+ 		ArrayList<InfoItemsSatisfacerValue> resp = new ArrayList<InfoItemsSatisfacerValue>();
+ 		ResultSet rs = super.hacerQuery(q, prepStmt);
+ 		while(rs.next())
+ 		{
+ 			int restante = rs.getInt(5);
+ 				resp.add( new InfoItemsSatisfacerValue(idPedidoComprador, rs.getString(2), rs.getDouble(3) , rs.getInt(5),restante));
+ 		}
+ 		return resp;
+ 	}
+ 	
+ 	public int insertarNuevoPedidoComprador (String correoComprador,String fechaEntrega , String idNuevo) throws Exception
+	{
+		
+		String q = "insert into pedidos_comprador values of ('"+idNuevo+"','"+correoComprador+"','"+fechaEntrega+"' )";
+		PreparedStatement prepStmt = null;
+		return super.ejecutarTask(q, prepStmt);
+	}
+	
+ 	public int insertarItemPedidoComprador(ItemPedidoValue item, String id) throws Exception
+ 	{
+ 		String q = "insert into items_pedido_comprador values of ('"+id+"','"+item.getNombProducto()+"',"+item.getPesoCaja()+" , "+item.getCantidad() +" )";
+ 		PreparedStatement prepStmt = null;
+		return super.ejecutarTask(q, prepStmt);
+ 	}
+ 	
+ 	public String generateNewId() throws SQLException
+	{
+		int resp = 0;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = super.hacerQuery(" SELECT MAX(ID) FROM ( SELECT CAST(ID AS INTEGER) AS ID FROM PEDIDO_OFERTA ) ", prepStmt);
+		if(rs.next())
+			resp = rs.getInt(1);
+			resp++;
+		return ""+resp;
+	}
+
+	public String consultarCorreoComprador(String idPedido) throws Exception 
+	{
+		String q = "select correo_proveedor from pedidos_comprador where id='"+idPedido+"'";
+		PreparedStatement prepStmt = null;
+		ResultSet rs = super.hacerQuery(q, prepStmt);
+		return rs.getString(1);
+		
+	}
+ 	
 }
