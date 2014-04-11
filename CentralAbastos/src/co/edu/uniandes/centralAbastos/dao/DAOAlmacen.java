@@ -489,6 +489,7 @@ public class DAOAlmacen extends ConsultaDAO
 		catch(Exception e)
 		{
 			throw e;
+
 		}
 		return resp;
 	}

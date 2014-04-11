@@ -396,6 +396,7 @@ public class CabAndes
 			 public void enviarPedidoAlLocal(ArrayList<ItemPedidoValue> itemsSolicitados, String idLocal ) throws Exception
 			 {
 				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas(" for update");
+
 				 modAlmacen.moverExistenciasAlLocal(idLocal, itemsBodegas, itemsSolicitados);
 			 }
 			

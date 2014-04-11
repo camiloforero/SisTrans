@@ -123,6 +123,7 @@ public class ModLocal
 	public ArrayList<ItemInventarioValue> darExistenciasDeUnLocal(String idLocal, String forUp)
 	{
 		return daoAlm.darExistenciasDeUnaBodega(idLocal, forUp);
+
 	}
 	
 }
