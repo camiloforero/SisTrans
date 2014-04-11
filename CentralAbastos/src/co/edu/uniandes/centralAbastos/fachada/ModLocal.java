@@ -22,7 +22,7 @@ public class ModLocal
 		
 	}
 	
-	public String darCodigoDeSuLocal(String correoAdmin)
+	public String darCodigoDeSuLocal(String correoAdmin) throws SQLException
     {
     	return daoAlm.darCodigoDelLocal(correoAdmin);
     }
@@ -46,7 +46,7 @@ public class ModLocal
 		// buscar en la bodegaDelAlmacen y asegurarme que hay peso suficiente. 
 		AlmacenValue local = daoAlm.darLocal(idLocal);
 		String tipoProd = daoAlm.darTipoProducto(nombreProducto);
-		ArrayList<ItemInventarioValue> itemsLocal = daoAlm.darExistenciasDeUnaBodega(idLocal); // existencias del local
+		ArrayList<ItemInventarioValue> itemsLocal = daoAlm.darExistenciasDeUnaBodega(idLocal," for update "); // existencias del local
 		
 		if( (local.getCapacidad()-local.getCantidad_kg()) >= pesoVendido )
 		{
@@ -120,9 +120,9 @@ public class ModLocal
 	 * @param idLocal
 	 * @return Tuplas de un local.
 	 */
-	public ArrayList<ItemInventarioValue> darExistenciasDeUnLocal(String idLocal)
+	public ArrayList<ItemInventarioValue> darExistenciasDeUnLocal(String idLocal, String forUp)
 	{
-		return daoAlm.darExistenciasDeUnaBodega(idLocal);
+		return daoAlm.darExistenciasDeUnaBodega(idLocal, forUp);
 	}
 	
 }

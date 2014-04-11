@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
+
 import co.edu.uniandes.centralAbastos.vos.AlmacenValue;
 import co.edu.uniandes.centralAbastos.vos.ItemInventarioValue;
 
@@ -92,7 +93,7 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @param tipoProd
 	 * @return
 	 */
-	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd, String codBodegaExc ) throws Exception
+	public ArrayList<AlmacenValue>darBodegasXTipo(String tipoProd, String codBodegaExc , String forUp ) throws Exception
 	{
 		if(codBodegaExc == null || codBodegaExc == "") codBodegaExc = " ";
 		PreparedStatement prepStmt = null;
@@ -100,7 +101,7 @@ public class DAOAlmacen extends ConsultaDAO
 		
 		try {
 		
-			ResultSet rs = super.hacerQuery( ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " , prepStmt);
+			ResultSet rs = super.hacerQuery( ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " + forUp , prepStmt);
 			System.out.println(ALL_BODEGAS+" WHERE A.TIPO_PRODUCTO = '"+tipoProd+"' and A.codigo != '"+codBodegaExc+"' " );
 			
 			while(rs.next()){
@@ -256,6 +257,7 @@ public class DAOAlmacen extends ConsultaDAO
 
 	public void cerrarBodega(String codigo) throws Exception
 	{
+		selectForUpdate( " almcen , bodega, item_inventario " );
 		PreparedStatement prepStmt = null;
 		try {
 			
@@ -283,6 +285,7 @@ public class DAOAlmacen extends ConsultaDAO
  
 	public void abrirBodega(String codigo) throws Exception
 	{
+		selectForUpdate( " bodegas " );
 		PreparedStatement prepStmt = null;
 		try {
 			
@@ -310,13 +313,13 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @param codigoBodega es el de la bodega.
 	 * @return La lista si se encontro la bodega, o vacia dlc.
 	 */
-	public ArrayList<ItemInventarioValue> darExistenciasDeUnaBodega(String codigoBodega)
+	public ArrayList<ItemInventarioValue> darExistenciasDeUnaBodega(String codigoBodega ,String forUp)
 	{
 		PreparedStatement prepStmt = null;
 		ArrayList<ItemInventarioValue> resp = new ArrayList<ItemInventarioValue>();
 		
 		try {
-			ResultSet rs = super.hacerQuery(ITEMS_INVENTARIO+" WHERE COD_ALMACEN='"+codigoBodega+"' ", prepStmt);
+			ResultSet rs = super.hacerQuery(ITEMS_INVENTARIO+" WHERE COD_ALMACEN='"+codigoBodega+"' "+forUp, prepStmt);
 			
 			while(rs.next()){
 				ItemInventarioValue item = new ItemInventarioValue(rs.getString(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),rs.getString(5));
@@ -377,21 +380,19 @@ public class DAOAlmacen extends ConsultaDAO
 	 * Capacidad total disponible en todas las bodegas diferentes a la que tiene codBodega.	
 	 * @return la capacidad en todas las bodegas distintas a codBodega. 
 	 * 		para retornar la capacidad de todas llamar el metodo con codBodega como cadena vacia.
+	 * @throws SQLException 
 	 */
-	public double darCapacidadTotalDisp(String codBodega, String tipoProducto)
+	public double darCapacidadTotalDisp(String codBodega, String tipoProducto) throws SQLException
 	{
 		PreparedStatement prepStmt = null;
 		double resp = 0;
-		try {
+		
 			System.out.println("SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO != '" + tipoProducto + "'" );
 			ResultSet rs = super.hacerQuery( "SELECT SUM(CAPACIDAD-CANTIDAD_PRODUCTO) FROM almacen a join bodegas b on a.codigo=b.cod_almacen WHERE b.cod_almacen !='"+codBodega+"' AND A.TIPO_PRODUCTO = '" + tipoProducto + "'" , prepStmt);
 			if(rs.next())
 				resp = rs.getDouble(1);
+
 			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		return resp;
 	}
@@ -401,22 +402,20 @@ public class DAOAlmacen extends ConsultaDAO
 	 * @param codigo
 	 * @param wcajas
 	 * @return true si la bodega maneja cajas de peso Wcaja o false dlc.
+	 * @throws SQLException 
 	 */
-	public boolean bodegaTienePresentaciones(String codigo, double wcajas) {
+	public boolean bodegaTienePresentaciones(String codigo, double wcajas) throws SQLException {
 		String qq=
 				"Select * from cajas where "+wcajas+" in (Select Distinct ii.peso_caja from (almacen a join bodegas b on a.codigo=b.cod_almacen) join item_inventario ii on a.codigo=ii.COD_ALMACEN where a.CODIGO='"+codigo+"')"; 
 		
-		try {
+		
 			ResultSet rs;
 			PreparedStatement prepStmt = null;
 			rs = super.hacerQuery(qq, prepStmt);
 			if(rs.next()) // si la tabla no viene vacia
 				return true;
 		
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	
 		return false;
 	
@@ -428,7 +427,7 @@ public class DAOAlmacen extends ConsultaDAO
 		PreparedStatement prepStmt = null;
 		ArrayList<AlmacenValue> a = new ArrayList<AlmacenValue>();
 		
-		try {
+		
 		
 			ResultSet rs = super.hacerQuery( ALL_BODEGA_INFO, prepStmt);
 			
@@ -444,11 +443,7 @@ public class DAOAlmacen extends ConsultaDAO
 				
 			}
 	
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally{
-			super.cerrarStatement(prepStmt);
-		}
+	
 	
 		return a;
 	}
@@ -460,30 +455,28 @@ public class DAOAlmacen extends ConsultaDAO
 	 * 
 	 * @param producto
 	 * @return tipo de un producto.
+	 * @throws SQLException 
 	 */
-	public String darTipoProducto(String producto)
+	public String darTipoProducto(String producto) throws SQLException
 	{
 		String qq = 
 				" Select tipo from productos where nombre = '"+producto+"' ";
 		PreparedStatement ps = null;
 		
-		try{
+		
 			ResultSet rs = super.hacerQuery(qq, ps);
 			if(rs.next())
 				return rs.getString(1);
-		}
-		catch (SQLException e)
-		{
-			
-		}
+		
+		
 		
 		return "";
 	}
 	
 	
-	public ArrayList<ItemInventarioValue> darExistenciasEnBodegas()
+	public ArrayList<ItemInventarioValue> darExistenciasEnBodegas(String forUp) throws Exception
 	{
-		String q = ITEMS_INVENTARIO+ ", bodegas b  where ii.cod_almacen=b.cod_almacen";
+		String q = ITEMS_INVENTARIO+ ", bodegas b  where ii.cod_almacen=b.cod_almacen "+ forUp;
 		PreparedStatement prepStmt = null;
 		ArrayList<ItemInventarioValue> resp = new ArrayList<ItemInventarioValue>();
 		try{
@@ -491,11 +484,11 @@ public class DAOAlmacen extends ConsultaDAO
 			while(rs.next()){
 				ItemInventarioValue item = new ItemInventarioValue(rs.getString(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),rs.getString(5));
 				resp.add(item);
-				}
+			}
 		}
-		catch(SQLException e)
+		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		return resp;
 	}
@@ -506,21 +499,19 @@ public class DAOAlmacen extends ConsultaDAO
 	 * 
 	 * @param correo
 	 * @return
+	 * @throws SQLException 
 	 */
-	public String darCodigoDelLocal(String correoAdmin)
+	public String darCodigoDelLocal(String correoAdmin) throws SQLException
 	{
 		String qq = 
 				" Select cod_almacen from admin_local where correo_usuario='"+correoAdmin+"'";
 		PreparedStatement ps = null;
-		try{
+		
 			ResultSet rs = super.hacerQuery(qq, ps);
 			if(rs.next())
 				return rs.getString(2);
-		}
-		catch(SQLException e)
-		{
-			e.printStackTrace();
-		}
+		
+	
 		
 		return "";
 	}
@@ -535,7 +526,7 @@ public class DAOAlmacen extends ConsultaDAO
 	{
 		ArrayList<Double> s = new ArrayList<Double>();
 		PreparedStatement prepStmt = null;
-		try {
+	
 			ResultSet rs = super.hacerQuery("select peso_presentacion from se_vende_en where tipo_producto = '"+TipoProducto+"'", prepStmt);
 			
 			while(rs.next())
@@ -544,15 +535,9 @@ public class DAOAlmacen extends ConsultaDAO
 			}
 			
 		
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		return s;
 	}
-	
-	
-	
+
+
 
 }

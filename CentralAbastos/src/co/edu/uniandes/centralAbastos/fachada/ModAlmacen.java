@@ -58,7 +58,9 @@ public class ModAlmacen
 	{
 		int num_cajas = pedidoEntrante.getCantidad();
 		double Wcaja = pedidoEntrante.getPresentacion();
-		ArrayList<AlmacenValue> bodegasDisp = dao.darBodegasXTipo(pedidoEntrante.getTipoProducto(), "" ); // TODO : transaccionalidad "Select for update para evitar lecturas sucias"
+		ArrayList<AlmacenValue> bodegasDisp = dao.darBodegasXTipo(pedidoEntrante.getTipoProducto(), "" , " for update " ); // TODO done
+		dao.selectForUpdate("item_inventario"); // lock la tabla
+		
 		for (AlmacenValue bod : bodegasDisp) 
 		{
 			double capDisp = bod.getCapacidad() - bod.getCantidad_kg();
@@ -70,7 +72,6 @@ public class ModAlmacen
 				
 				return true;
 			}
-			dao.commit();
 		}
 		
 		// parte el pedido y lo almacena en distintas bodegas donde vaya encontrando espacio 
@@ -94,12 +95,13 @@ public class ModAlmacen
 		
     	AlmacenValue bodegaToMod = dao.darBodega(codBodega);
     	if(bodegaToMod.getCantidad_kg() == 0) return true;
-    	ArrayList<ItemInventarioValue> existenciasBodega = dao.darExistenciasDeUnaBodega(codBodega); // TODO interacciones transaccionalidad
+    	ArrayList<ItemInventarioValue> existenciasBodega = dao.darExistenciasDeUnaBodega(codBodega, " for update "); // TODO interacciones transaccionalidad
+    	dao.selectForUpdate(" almacen ");// lock
     	for (ItemInventarioValue it : existenciasBodega) {
 			System.out.println(existenciasBodega.size() + " " + it.getNomb_producto());
 		}
 		
-    	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega, bodegaToMod.getTipoProducto()); 
+    	double capTotalDisp = dao.darCapacidadTotalDisp(codBodega, bodegaToMod.getTipoProducto() ); 
     	System.out.println("Capacidad total disponible en otras bodegas " + capTotalDisp);
     	boolean resp = false;
     	if( (capTotalDisp-bodegaToMod.getCantidad_kg()) >= 0 ) // Hay espacio disponible en las bodegas de cabandes para almacenar el pedido. 
@@ -127,7 +129,7 @@ public class ModAlmacen
 				double Wcajas = item.getPresentacion();
 				
 				// trata de almacenarlo simplemente buscando donde cabe y listo.
-				ArrayList<AlmacenValue> bodegasDisponibles = dao.darBodegasXTipo(tipoProductoBodega, item.getCod_almacen());
+				ArrayList<AlmacenValue> bodegasDisponibles = dao.darBodegasXTipo(tipoProductoBodega, item.getCod_almacen(), " for update");
 				
 				for (AlmacenValue bod : bodegasDisponibles) {
 					double d = (bod.getCapacidad()-bod.getCantidad_kg()) - num_cajas*Wcajas;
@@ -258,6 +260,7 @@ public class ModAlmacen
 		    public void descontarExistenciasDeBodega(String idBodega, String producto, double pesoCaja, String fechaExpProducto, int cajasSolicitadas ) throws Exception
 		    {
 		    	dao.updateCantidadCajas(producto, pesoCaja, -cajasSolicitadas ,idBodega,fechaExpProducto);
+		   
 		    	dao.updateAlmacen(-cajasSolicitadas*pesoCaja, idBodega);
 		    }
 
@@ -513,6 +516,7 @@ public class ModAlmacen
 	{
 		dao.establecerConexion();
 		dao.abrirBodega(codigo);
+		dao.commit();
 		dao.closeConnection();
 	}
 

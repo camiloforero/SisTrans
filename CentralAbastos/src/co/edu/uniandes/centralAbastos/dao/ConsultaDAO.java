@@ -27,6 +27,7 @@ import java.util.Properties;
 
 
 
+
 import co.edu.uniandes.centralAbastos.vos.VideosValue;
 
 /**
@@ -466,6 +467,10 @@ public class ConsultaDAO {
 	   
    }
    
-   
+   public void selectForUpdate(String string) throws SQLException 
+	{
+		PreparedStatement prepStmt = null;
+		hacerQuery("select * from "+string+" for update", prepStmt);	
+	}
  
 }

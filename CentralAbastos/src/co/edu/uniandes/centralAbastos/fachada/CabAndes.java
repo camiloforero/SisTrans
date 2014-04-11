@@ -10,6 +10,7 @@
  */
 package co.edu.uniandes.centralAbastos.fachada;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -338,18 +339,38 @@ public class CabAndes
 		  */
 	 public void registrarEntregaDeProveedor(String idPedidoEfectivo) throws Exception
 	 {
-		 DAOPedidosEfectivos daoPE = new DAOPedidosEfectivos(ruta);
-		 PedidoEfectivoValue pedidoEntrante = daoPE.darPedidoEfectivo(idPedidoEfectivo);
-		 System.out.println(pedidoEntrante.getFechaExpiracion());
-		 if(this.asignarEnBodegas(pedidoEntrante))
-		 {
-			 daoPE.registrarFechaLlegada(idPedidoEfectivo);
-			 proveedorDetallesValue pdv = daoPE.darDetallesProveedorDePedidoEfectivo(idPedidoEfectivo);
-			 // calficar al proveedor
-			 int nuevaCal = (5-pdv.diasTarde) > 0 ? 5-pdv.diasTarde : 0 ;
-			 int cal = ( (pdv.numEntregas/(pdv.numEntregas+1))*pdv.calificacion +  (1/(pdv.numEntregas+1))*nuevaCal ) ;
-			 daoPE.updateValoresProveedor(pdv.correo, cal);
+		 dao.establecerConexion();
+		 dao.setAutocommit(false);
+		 boolean resp = false;
+		 try{
+			
+			 // operacion
+			 DAOPedidosEfectivos daoPE = new DAOPedidosEfectivos(ruta);
+			 PedidoEfectivoValue pedidoEntrante = daoPE.darPedidoEfectivo(idPedidoEfectivo); 
+			 System.out.println(pedidoEntrante.getFechaExpiracion());
+			 if(this.asignarEnBodegas(pedidoEntrante))
+			 {
+				 daoPE.registrarFechaLlegada(idPedidoEfectivo); // TODO 
+				 proveedorDetallesValue pdv = daoPE.darDetallesProveedorDePedidoEfectivo(idPedidoEfectivo, " for update");
+				 // calficar al proveedor
+				 int nuevaCal = (5-pdv.diasTarde) > 0 ? 5-pdv.diasTarde : 0 ;
+				 int cal = ( (pdv.numEntregas/(pdv.numEntregas+1))*pdv.calificacion +  (1/(pdv.numEntregas+1))*nuevaCal ) ;
+				 daoPE.updateValoresProveedor(pdv.correo, cal);
+			 }
+			 dao.commit();
 		 }
+		 catch(Exception e)
+		 {
+			 e.printStackTrace();
+			 dao.rollback();
+		 }
+		 finally{
+			 dao.setAutocommit(true);
+			 dao.closeConnection();
+		 }
+		
+		 
+		 
 		 
 		 
 		 
@@ -374,7 +395,7 @@ public class CabAndes
 	
 			 public void enviarPedidoAlLocal(ArrayList<ItemPedidoValue> itemsSolicitados, String idLocal ) throws Exception
 			 {
-				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas();
+				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas(" for update");
 				 modAlmacen.moverExistenciasAlLocal(idLocal, itemsBodegas, itemsSolicitados);
 			 }
 			
@@ -405,7 +426,8 @@ public class CabAndes
 			  */
 			 public void enviarPedidoAlComprador(ArrayList<ItemPedidoValue> itemsSolicitados) throws Exception
 			 {
-				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas();
+				 ArrayList<ItemInventarioValue> itemsBodegas = modAlmacen.getDaoAlmacen().darExistenciasEnBodegas(" for update ");
+				 dao.selectForUpdate(" almacen ");
 				 modAlmacen.sacarExistenciasSegunPedidoComprador(itemsBodegas, itemsSolicitados);
 			 }
 			 
@@ -413,23 +435,44 @@ public class CabAndes
 			 
 			 public void saisfacerPedidoComprador(ArrayList<ItemPedidoValue> itemsPedido) throws Exception
 			 {
-					ArrayList<InfoItemsSatisfacerValue> existenciasSatisfacenInfo = modPedidos.getDaoPedidos().darItemsParaSatisfacer( itemsPedido.get(0).getIdPedido() );
-					ArrayList<ItemPedidoValue> itemsRestantes = new ArrayList<ItemPedidoValue>();
-					for( int i = 0; i < existenciasSatisfacenInfo.size() ; i++)
-					{
-						InfoItemsSatisfacerValue temp = existenciasSatisfacenInfo.get(i);
-						if( temp.getRestante() > 0 ){
-							itemsRestantes.add(new ItemPedidoValue(temp.getIdPedido(), temp.getNombProducto(), temp.getPesoCaja(), temp.getRestante()) ); // quedan los que deben pedir auxiliar.
-							itemsPedido.remove( i ); // quedan los que se pueden satisfacer
+				 dao.establecerConexion();
+				 dao.setAutocommit(false);
+				 boolean resp = false;
+				 try{
+					
+					 // operacion
+
+						ArrayList<InfoItemsSatisfacerValue> existenciasSatisfacenInfo = modPedidos.getDaoPedidos().darItemsParaSatisfacer( itemsPedido.get(0).getIdPedido() );
+						ArrayList<ItemPedidoValue> itemsRestantes = new ArrayList<ItemPedidoValue>();
+						for( int i = 0; i < existenciasSatisfacenInfo.size() ; i++)
+						{
+							InfoItemsSatisfacerValue temp = existenciasSatisfacenInfo.get(i);
+							if( temp.getRestante() > 0 ){
+								itemsRestantes.add(new ItemPedidoValue(temp.getIdPedido(), temp.getNombProducto(), temp.getPesoCaja(), temp.getRestante()) ); // quedan los que deben pedir auxiliar.
+								itemsPedido.remove( i ); // quedan los que se pueden satisfacer
+							}
 						}
-					}
-					
-					
-					// satisfago lo que puedea del pedido, que en el mejor de los casos es todo.
-					this.enviarPedidoAlComprador(itemsPedido);
-					if(!itemsRestantes.isEmpty()){
-						this.generarPedidoAux(itemsRestantes , PEDIDO_COMPRADOR);
-					}
+						
+						
+						// satisfago lo que puedea del pedido, que en el mejor de los casos es todo.
+						// LOCKS: ITEM INVENTARIO Y ALMACEN
+						this.enviarPedidoAlComprador(itemsPedido);
+						
+						if(!itemsRestantes.isEmpty()){
+							this.generarPedidoAux(itemsRestantes , PEDIDO_COMPRADOR);
+						}
+			
+					 dao.commit();
+				 }
+				 catch(Exception e)
+				 {
+					 e.printStackTrace();
+					 dao.rollback();
+				 }
+				 finally{
+					 dao.setAutocommit(true);
+					 dao.closeConnection();
+				 }
 			}
 			 
 		 /**
@@ -488,6 +531,9 @@ public class CabAndes
 						// genero pedido comprador auxiliar.
 						String nID = daoPedido.generateNewId();
 						String correoComprador = daoPedido.consultarCorreoComprador(itemsRestantes.get(0).getIdPedido());
+						
+						dao.selectForUpdate(" items_pedido_comprador , pedidos_comprador "); // locks : 
+						
 						daoPedido.insertarNuevoPedidoComprador(correoComprador, sdf.format(maxFechaEntrega), nID);
 						for(int i = 0 ; itemsRestantes.size() > i ; i++)
 						{
@@ -508,6 +554,8 @@ public class CabAndes
 			
 		// otro metodo de apoyo que comieza una nueva licitacion
 		private void pedirRestanteAProveedor(ArrayList<ItemPedidoValue> itemsRestantes) throws Exception {
+			
+			// lock : ofertas
 			for(int i = 0 ; i < itemsRestantes.size(); i++)
 			{
 				ItemPedidoValue temp = itemsRestantes.get(i);
@@ -521,9 +569,8 @@ public class CabAndes
 		  */
 		 private boolean asignarEnBodegas(PedidoEfectivoValue pedidoEntrante) throws Exception
 		 {
-			 return modAlmacen.asignarEnBodegas(pedidoEntrante);
+			 return   modAlmacen.asignarEnBodegas(pedidoEntrante);
 		 }
-
 		/**
 		 * Cierra la bodega cuyo código entra como parámetro</br>
 		 * <b>pre: <b>La bodega debe existir, y estar abierta </br>
@@ -543,8 +590,7 @@ public class CabAndes
 		 */
 		public void abrirBodega(String codigo) throws Exception
 		{
-			
+		
 			modAlmacen.abrirBodega(codigo);
-			
 		}
 }

@@ -127,11 +127,11 @@ public class DAOPedidosEfectivos extends ConsultaDAO
 	}
 	// End clase interna.
 	
-	public proveedorDetallesValue darDetallesProveedorDePedidoEfectivo(String idPedido) throws SQLException
+	public proveedorDetallesValue darDetallesProveedorDePedidoEfectivo(String idPedido, String forUp) throws SQLException
 	{
 		
 		PreparedStatement prepStmt = null;
-		ResultSet rs = super.hacerQuery(q2+" AND PE.ID_PEDIDO='"+idPedido+"' " , prepStmt);
+		ResultSet rs = super.hacerQuery(q2+" AND PE.ID_PEDIDO='"+idPedido+"' "+forUp , prepStmt);
 		if(rs.next())
 		{
 			return new proveedorDetallesValue(rs.getString(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
